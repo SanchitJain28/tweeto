@@ -8,6 +8,9 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
+      options:{
+        emailRedirectTo:'http://localhost:3000/welcome'
+      }
     });
     console.log(error)
     if (error) {
