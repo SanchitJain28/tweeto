@@ -7,17 +7,35 @@ import SignOut from "@/components/signOut";
 export default function ConfirmEmail() {
   const router = useRouter();
   const supabase = createClient();
+
+  const checkIfProfileExists = async (userId: string) => {
+    // console.log(userId)
+    const { data, error } = await supabase
+      .from("profiles")
+      .select()
+      .eq("id", userId);
+    if (error) {
+      console.error("Error fetching profile:", error);
+      return false;
+    }
+    console.log(data)
+    if (data.length === 0) {
+      console.log("Profile does not exist, redirecting to username setup");
+      router.push(`/signup/profile`);
+      return false;
+    }
+    router.push("/");
+
+    console.log(data);
+  };
   const checkIfLoggedIn = async () => {
     const { data, error } = await supabase.auth.getSession();
-
     if (error) {
       console.error("Error fetching session:", error);
       return;
     }
-    console.log(data);
     if (data.session) {
-      console.log(data.session);
-      router.push("/");
+      checkIfProfileExists(data.session.user.id);
     }
   };
   useEffect(() => {
