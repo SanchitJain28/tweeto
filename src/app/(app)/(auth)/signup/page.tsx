@@ -13,19 +13,48 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Twitter } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-
+import { User } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/client";
+import LoadingBackdrop from "@/components/loadingBackdrop";
+import { useRouter } from 'next/navigation'
 export default function SignupPage() {
+    const router = useRouter()
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const handleSignUp = async (event:React.FormEvent) => {
-    event.preventDefault()
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
+  const supabase = createClient();
+  const getUser = async () => {
+    const { data } = await supabase.auth.getUser();
+    setUser(data.user);
+    console.log(data)
+  };
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  if (user) {
+    return (
+      <div>
+        <h1>You are already logged in </h1>
+      </div>
+    );
+  }
+
+
+
+  const handleSignUp = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setLoading(true);
     try {
       const { data } = await axios.post("/api/signup", {
         email,
         password,
       });
+      router.push(`signup/confirm?e=${email}&p=${password}`);
       console.log(data);
     } catch (error) {
       console.log(error);
@@ -131,6 +160,8 @@ export default function SignupPage() {
           </div>
         </CardFooter>
       </Card>
+
+    <LoadingBackdrop isVisible={loading} message="Loading"/>
     </div>
   );
 }
