@@ -14,17 +14,19 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Twitter } from "lucide-react";
 import axios, { AxiosError } from "axios";
-import { toast } from "sonner";
-import { useEffect, useState } from "react";
+
+import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
-  const router=useRouter()
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const supabase = createClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user,setUser]=useState(false)
   const handleSignIn = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
@@ -33,24 +35,51 @@ export default function LoginPage() {
     } catch (error) {
       console.log(error);
       const { response } = error as AxiosError<{ message: string }>;
-      toast("Error logging you in", {
-        description: response?.data?.message,
-      });
+      toast("Error logging you in with Google" + response?.data.message);
     }
   };
 
-  const getUser = async () => {
-    const {data:{user}} = await supabase.auth.getUser();
-    if(user){setUser(true)}
+  const handleSignInWithGoogle = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          scopes: "email profile",
+        },
+      });
+      console.log(data);
+      if (error) {
+        console.log(error);
+        toast("Error logging you in with Google" + error);
+      }
+      // toast("Google login successful", {
+      //   position: "bottom-center",
+      //   type: "success",
+      // });
+    } catch (error) {
+      console.log(error);
+      const { response } = error as AxiosError<{ message: string }>;
+      toast("Error logging you in with Google" + response?.data.message);
+    }
   };
-  useEffect(() => {
-    getUser()
-  }, [])
 
-  if(user){
-    router.push("/")
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle>Loading...</CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+    );
   }
-  
+
+  if (user) {
+    router.push("/");
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
@@ -69,6 +98,7 @@ export default function LoginPage() {
           <Button
             className="w-full bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
             variant="outline"
+            onClick={handleSignInWithGoogle}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path

@@ -11,11 +11,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-
+import { useDebounce } from "@uidotdev/usehooks";
 import { useForm } from "react-hook-form";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 interface FormData {
   username: string;
@@ -24,9 +26,13 @@ interface FormData {
 }
 export default function CreateProfile() {
   const { register, handleSubmit } = useForm<FormData>();
-
+  const [username, setUsername] = useState<string>("");
+  const [isUsernameTaken, setIsUsernameTaken] = useState<boolean | null>(null);
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
+  const debouncedSearchTerm = useDebounce(username, 300);
+
   const getUser = async () => {
     try {
       const {
@@ -59,10 +65,54 @@ export default function CreateProfile() {
         console.error("Error creating profile:", error);
         return;
       }
+      toast("Profile created successfully!", {
+        position:"bottom-center",
+        type: "success",
+      });
+      router.push("/");
     } catch (error) {
       console.log(error);
     }
   };
+
+  const checkForUsername = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("username", username);
+
+      if (error) {
+        console.error("Error checking username:", error);
+        return false;
+      }
+
+      if (data.length !== 0) {
+        console.log("Username already exists");
+        setIsUsernameTaken(true);
+        return true; // Username is taken
+      }
+      setIsUsernameTaken(false);
+      return false; // Username is available
+    } catch (error) {
+      console.error("Error checking username:", error);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    const checkUsername = async () => {
+      if (debouncedSearchTerm) {
+        const isTaken = await checkForUsername();
+        if (isTaken) {
+          console.log("Username is taken");
+        } else {
+          console.log("Username is available");
+        }
+      }
+    };
+    checkUsername();
+  }, [debouncedSearchTerm]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -86,10 +136,20 @@ export default function CreateProfile() {
                 id="username"
                 {...register("username")}
                 placeholder="your-username"
+                onChange={(e) => setUsername(e.target.value)}
                 className="pl-8 pr-10"
                 required
               />
             </div>
+            <p
+              className={`text-black text-sm -mt-2 ${isUsernameTaken === null ? "text-gray-500" : isUsernameTaken ? "text-red-500" : "text-green-500"}`}
+            >
+              {isUsernameTaken === null
+                ? ""
+                : isUsernameTaken
+                  ? "Username is taken"
+                  : "Username is available"}
+            </p>
             <div className="space-y-2">
               <Label htmlFor="displayName">Display Name</Label>
               <Input

@@ -29,7 +29,6 @@ export function AuthContext({ children }: { children: React.ReactNode }) {
     }
   };
 
-
   const getSession = async () => {
     setLoading(true);
     try {
