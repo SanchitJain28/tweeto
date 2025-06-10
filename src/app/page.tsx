@@ -357,7 +357,7 @@ export default function Home() {
             </span>
           </div>
           <p className="text-xs text-muted-foreground sm:ml-4">
-            © 2024 tweeto. All rights reserved.
+            © 2025 tweeto. All rights reserved.
           </p>
           <nav className="sm:ml-auto flex gap-4 sm:gap-6">
             <Link
