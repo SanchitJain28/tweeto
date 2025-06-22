@@ -3,12 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthContext } from "@/contexts/authContext";
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
+import ReactQueryProvider from "./ReactQueryProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
-
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -31,8 +31,8 @@ export default async function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <Toaster />
-          <ToastContainer/>
-          {children}
+          <ToastContainer />
+          <ReactQueryProvider>{children}</ReactQueryProvider>
         </body>
       </AuthContext>
     </html>

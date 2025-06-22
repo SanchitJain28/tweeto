@@ -1,7 +1,6 @@
 "use client";
-import LoadingBackdrop from "@/components/loadingBackdrop";
-import SignOut from "@/components/signOut";
-import { useAuth } from "@/hooks/useAuth";
+import LoadingBackdrop from "@/components/loading/loadingBackdrop";
+import {  useAuth, useProfile } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,70 +19,31 @@ import {
   Check,
 } from "lucide-react";
 import Link from "next/link";
+import NotSignedIn from "@/components/signin-signup/not-signedin";
+import Header from "@/components/header-footer-sidebar/Header";
 
 export default function Home() {
-  // const [loading, setLoading] = useState(false);
   const { user, loading } = useAuth();
 
-  if (loading) {
+  const {data:USER , isPending} = useProfile({id:user?.id ?? "" , enabled:!loading})
+
+  const LOADING = loading || isPending
+
+  if (LOADING) {
     return (
       <LoadingBackdrop isVisible={loading} message="Loading , Please wait" />
     );
   }
 
   if (!user) {
-    return (
-      <div className="justify-center flex text-4xl">
-        Please log in
-        <SignOut />
-      </div>
-    );
+    return <NotSignedIn />;
   }
+
   return (
     <div className="">
       <div className="flex flex-col min-h-screen">
         {/* Header */}
-        <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
-          <Link href="/" className="flex items-center justify-center gap-2">
-            <div className="bg-gradient-to-r from-orange-500 to-pink-500 p-2 rounded-xl">
-              <Bird className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-              tweeto
-            </span>
-          </Link>
-          <nav className="ml-auto flex gap-4 sm:gap-6">
-            <Link
-              href="#features"
-              className="text-sm font-medium hover:text-orange-500 transition-colors"
-            >
-              Features
-            </Link>
-            <Link
-              href="#about"
-              className="text-sm font-medium hover:text-orange-500 transition-colors"
-            >
-              About
-            </Link>
-            <Link
-              href="#pricing"
-              className="text-sm font-medium hover:text-orange-500 transition-colors"
-            >
-              Pricing
-            </Link>
-          </nav>
-          <div className="ml-6 flex gap-2">
-            <Button variant="ghost" size="sm">
-              Sign In
-            </Button>
-            <Button
-              size="sm"
-              className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600"
-            >
-              Get Started
-            </Button>
-          </div>
-        </header>
+        <Header isWithProfile={true} firstName="Sanchit Jain"/>
 
         <main className="flex-1">
           {/* Hero Section */}
@@ -154,7 +114,7 @@ export default function Home() {
                             </div>
                           </div>
                           <p className="text-sm">
-                            Just joined tweeto and I'm loving the clean
+                            Just joined tweeto and I m loving the clean
                             interface and genuine conversations! This is what
                             social media should be. 🚀
                           </p>
@@ -214,7 +174,7 @@ export default function Home() {
                     </div>
                     <h3 className="text-xl font-bold mb-2">Privacy First</h3>
                     <p className="text-muted-foreground">
-                      Your data belongs to you. We don't sell your information
+                      Your data belongs to you. We don t sell your information
                       or show intrusive ads.
                     </p>
                   </CardContent>
@@ -313,7 +273,7 @@ export default function Home() {
                   </h2>
                   <p className="mx-auto max-w-[600px] text-orange-100 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                     Start sharing your thoughts and connecting with amazing
-                    people today. It's free and always will be.
+                    people today. It s free and always will be.
                   </p>
                 </div>
                 <div className="w-full max-w-sm space-y-2">

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
 export default function CallbackPage() {
+  console.log("RUNNING");
   const router = useRouter();
   const supabase = createClient();
   const { user, loading } = useAuth();
@@ -31,10 +32,10 @@ export default function CallbackPage() {
   };
 
   useEffect(() => {
-    if (!loading && user) {
+    if (user) {
       checkIfProfileExists(user.id);
     }
-  }, [loading,user]);
+  }, [loading, user]);
 
   if (loading) {
     return (

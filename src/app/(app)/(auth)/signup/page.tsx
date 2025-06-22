@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
-import LoadingBackdrop from "@/components/loadingBackdrop";
+import LoadingBackdrop from "@/components/loading/loadingBackdrop";
 import { useRouter } from 'next/navigation'
 export default function SignupPage() {
     const router = useRouter()

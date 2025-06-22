@@ -44,7 +44,7 @@ export default function LoginPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `https://tweeto-sooty.vercel.app/auth/callback`,
+          redirectTo: `http://localhost:3000/auth/callback`,
           scopes: "email profile",
         },
       });

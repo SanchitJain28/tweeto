@@ -18,7 +18,6 @@ import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-
 interface FormData {
   username: string;
   displayName: string;
@@ -51,6 +50,8 @@ export default function CreateProfile() {
     getUser();
   }, []);
 
+  
+
   const createNewProfile = async (data: FormData) => {
     console.log(data);
     console.log(user?.id);
@@ -62,16 +63,28 @@ export default function CreateProfile() {
         bio: data.bio,
       });
       if (error) {
-        console.error("Error creating profile:", error);
-        return;
+        if (error.code === "23505") {
+          toast(
+            <div>
+              <p className="text-lg font-bold">
+                Profile already exists ,Redirecting you to home page
+              </p>
+            </div>
+          );
+          setTimeout(() => {
+            router.replace("/");
+          }, 1500);
+          return
+        }
       }
       toast("Profile created successfully!", {
-        position:"bottom-center",
+        position: "bottom-center",
         type: "success",
       });
       router.push("/");
     } catch (error) {
       console.log(error);
+      
     }
   };
 

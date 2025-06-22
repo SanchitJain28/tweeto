@@ -17,6 +17,8 @@ export function AuthContext({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
   const supabase = createClient();
 
+  
+
    const signOut = async () => {
     setLoading(true);
     try {

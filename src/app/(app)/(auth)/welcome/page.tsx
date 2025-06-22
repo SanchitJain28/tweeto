@@ -1,13 +1,13 @@
 // /pages/auth/callback.js
-"use client"
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
-
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export default function AuthCallback() {
   const router = useRouter();
-  const supabase = createClient()
+  const supabase = createClient();
+
   useEffect(() => {
     const checkSession = async () => {
       const {
@@ -16,10 +16,7 @@ export default function AuthCallback() {
 
       if (session) {
         // ✅ User is now logged in
-        router.push('/'); // go to username setup
-      } else {
-        // Handle failed login or session
-        router.push('/signup/confirm'); // fallback
+        router.push("/signup/profile"); // go to username setup
       }
     };
 
