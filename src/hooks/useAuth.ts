@@ -26,19 +26,21 @@ export async function getProfile(id: string): Promise<Profile> {
 
 export async function getFullProfile(id: string): Promise<FullProfile> {
   const { data, error } = await supabase
-  .from("profiles")
-  .select(
-    `
+    .from("profiles")
+    .select(
+      `
       *,
       tweets_with_counts (
         *
       )
     `
-  )
-  .eq("id", id)
-  .order("created_at", { ascending: false, referencedTable: "tweets_with_counts" }) // 👈 THIS
-  .maybeSingle();
-
+    )
+    .eq("id", id)
+    .order("created_at", {
+      ascending: false,
+      referencedTable: "tweets_with_counts",
+    }) // 👈 THIS
+    .maybeSingle();
 
   if (error) throw error;
   return data;
@@ -70,8 +72,8 @@ export const useFullProfile = ({
   return useQuery({
     queryKey: ["FullProfile", id],
     queryFn: () => getFullProfile(id),
-    staleTime: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-    gcTime: 24 * 60 * 60 * 1000, // Keep in cache for 24 hours
+    staleTime: 0,
+    gcTime:0,
     enabled: enabled,
   });
 };

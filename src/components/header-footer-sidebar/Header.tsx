@@ -1,4 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import NotificationBell from "../Like-comment/NotificationBell";
+import Link from "next/link";
 
 interface BaseProps {
   avatarUrl?: string;
@@ -27,7 +29,7 @@ export default function Header({
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
       <div className=" mx-auto px-4 py-4">
-        <div className="flex lg:items-start items-center gap-3">
+        <div className="flex lg:items-start items-center justify-between gap-3">
           {isWithProfile && (
             <Avatar className="h-10 w-10 ring-2 ring-blue-100">
               <AvatarImage src={avatarUrl} alt={displayName} />
@@ -36,6 +38,7 @@ export default function Header({
               </AvatarFallback>
             </Avatar>
           )}
+
           <div>
             <h1 className="text-xl font-semibold text-gray-900">
               Welcome back {isWithProfile ? `, ${firstName}` : ""}
@@ -43,6 +46,12 @@ export default function Header({
             <p className="text-sm text-gray-500">
               Share your thoughts with the world
             </p>
+          </div>
+
+          <div className="">
+            <Link href="/notifications">
+              <NotificationBell size={30} className="flex items-center" />
+            </Link>
           </div>
         </div>
       </div>

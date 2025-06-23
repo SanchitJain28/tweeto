@@ -17,7 +17,6 @@ import { useAuth, useFullProfile } from "@/hooks/useAuth";
 import { FullProfile } from "@/types/Types";
 import {
   Calendar,
-  Heart,
   MessageCircle,
   User,
   Edit3,
@@ -27,6 +26,8 @@ import {
 import { useEffect, useState } from "react";
 import { DeleteTweetModal } from "./deleteModal";
 import axios from "axios";
+import LikeButton from "@/components/Like-comment/LikeButton";
+import Link from "next/link";
 
 export default function ProfileClient() {
   const { user } = useAuth();
@@ -142,6 +143,7 @@ export default function ProfileClient() {
   // When fullProfile is fetched, sync it to local state once
   useEffect(() => {
     if (fullProfile) {
+      console.log(fullProfile);
       setLocalProfile(fullProfile);
     }
   }, [fullProfile]);
@@ -197,6 +199,10 @@ export default function ProfileClient() {
         </div>
       </div>
     );
+  }
+
+  if (!user) {
+    return;
   }
 
   return (
@@ -336,99 +342,106 @@ export default function ProfileClient() {
           ) : (
             <div className="space-y-6">
               {localProfile?.tweets_with_counts.map((tweet, index) => (
-                <Card
+                <Link
+                  href={`tweet/${tweet.id}`}
                   key={tweet.id || index}
-                  className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden group"
+                  className=""
                 >
-                  {tweet.image_url && (
-                    <div className="relative overflow-hidden">
-                      <img
-                        src={tweet.image_url || "/placeholder.svg"}
-                        alt={`Tweet image for: ${tweet.text.substring(0, 50)}...`}
-                        className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                    </div>
-                  )}
-
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      {/* Tweet Content */}
-                      <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-lg">
-                        {tweet.text}
-                      </p>
-
-                      {/* Three Dot Menu */}
-                      <div className="flex justify-end">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-800"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Open menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setModalProps(tweet);
-                                setIsOpen(true);
-                              }}
-                              className="cursor-pointer"
-                            >
-                              <Edit3 className="mr-2 h-4 w-4" />
-                              Update Tweet
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setIsDeleteModalOpen(true);
-                                setDeleteTweet(tweet);
-                              }}
-                              className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete Tweet
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                  <Card className="border-0 shadow-lg hover:shadow-xl my-4 transition-all duration-300 hover:-translate-y-1 overflow-hidden group">
+                    {tweet.image_url && (
+                      <div className="relative overflow-hidden">
+                        <img
+                          src={tweet.image_url || "/placeholder.svg"}
+                          alt={`Tweet image for: ${tweet.text.substring(0, 50)}...`}
+                          className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                       </div>
+                    )}
 
-                      <Separator className="my-4" />
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        {/* Tweet Content */}
+                        <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-lg">
+                          {tweet.text}
+                        </p>
 
-                      {/* Tweet Metadata */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-6">
-                          <div className="flex items-center gap-2 text-pink-600 dark:text-pink-400">
-                            <div className="p-2 rounded-full bg-pink-50 dark:bg-pink-900/20 group-hover:bg-pink-100 dark:group-hover:bg-pink-900/30 transition-colors">
-                              <Heart className="h-4 w-4" />
-                            </div>
-                            <span className="font-medium">
-                              {tweet.like_count}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-                            <div className="p-2 rounded-full bg-blue-50 dark:bg-blue-900/20 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-colors">
-                              <MessageCircle className="h-4 w-4" />
-                            </div>
-                            <span className="font-medium">
-                              {tweet.reply_count}
-                            </span>
-                          </div>
+                        {/* Three Dot Menu */}
+                        <div className="flex justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-800"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Open menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuItem
+                                onClick={(e: React.MouseEvent) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setModalProps(tweet);
+                                  setIsOpen(true);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <Edit3 className="mr-2 h-4 w-4" />
+                                Update Tweet
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e: React.MouseEvent) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setIsDeleteModalOpen(true);
+                                  setDeleteTweet(tweet);
+                                }}
+                                className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete Tweet
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
 
-                        <time className="text-sm text-muted-foreground bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full">
-                          {formatDate(tweet.created_at)}
-                        </time>
+                        <Separator className="my-4" />
+
+                        {/* Tweet Metadata */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-2 text-pink-600 dark:text-pink-400">
+                              <LikeButton
+                                id={tweet.id}
+                                user_id={user.id}
+                                count={tweet.like_count}
+                                likeState={tweet.liked_by_current_user}
+                              />
+                            </div>
+                            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                              <div className="p-2 rounded-full bg-blue-50 dark:bg-blue-900/20 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-colors">
+                                <MessageCircle className="h-4 w-4" />
+                              </div>
+                              <span className="font-medium">
+                                {tweet.reply_count}
+                              </span>
+                            </div>
+                          </div>
+
+                          <time className="text-sm text-muted-foreground bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full">
+                            {formatDate(tweet.created_at)}
+                          </time>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           )}

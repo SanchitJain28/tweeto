@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthContext } from "@/contexts/authContext";
 import { ToastContainer } from "react-toastify";
 import ReactQueryProvider from "./ReactQueryProvider";
+import { NotificationProvider } from "@/contexts/notificationContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,7 +33,9 @@ export default async function RootLayout({
         >
           <Toaster />
           <ToastContainer />
-          <ReactQueryProvider>{children}</ReactQueryProvider>
+          <ReactQueryProvider>
+            <NotificationProvider>{children}</NotificationProvider>
+          </ReactQueryProvider>
         </body>
       </AuthContext>
     </html>

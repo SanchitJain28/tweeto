@@ -6,7 +6,14 @@ export interface Profile {
   full_name: string;
 }
 
+export interface Comment {
+  user_id: string;
+  text: string;
+  created_at: Date;
+}
+
 export interface Tweet {
+  user_name: string;
   created_at: Date;
   id: string;
   image_url: string;
@@ -15,6 +22,8 @@ export interface Tweet {
   reply_count: number;
   text: string;
   updated_at: Date;
+  liked_by_current_user: boolean;
+  comments: Comment[];
 }
 
 export interface FullProfile {
@@ -24,4 +33,22 @@ export interface FullProfile {
   bio: string;
   full_name: string;
   tweets_with_counts: Tweet[];
+}
+
+export interface Notification {
+  id: string;
+  recipient_id: string;
+  sender_id: string;
+  tweet_id: string;
+  type: "like" | "comment";
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface NotificationView {
+  notification_id: string
+  recipient_id: string
+  sender_id: string
+  sender_username: string
+  notification_text: string
 }
