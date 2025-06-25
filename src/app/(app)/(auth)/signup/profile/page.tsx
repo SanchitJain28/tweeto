@@ -77,7 +77,7 @@ export default function CreateProfile() {
           return
         }
       }
-      toast("Profile created successfully!", {
+      toast("Profile created and tadk successfully!", {
         position: "bottom-center",
         type: "success",
       });
