@@ -54,7 +54,8 @@ export default function SignupPage() {
         email,
         password,
       });
-      router.push(`signup/confirm?e=${email}&p=${password}`);
+      router.push(`signup/profile`);
+      // router.push(`signup/confirm?e=${email}&p=${password}`);
       console.log(data);
     } catch (error) {
       console.log(error);

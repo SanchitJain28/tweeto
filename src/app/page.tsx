@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import NotSignedIn from "@/components/signin-signup/not-signedin";
 import Header from "@/components/header-footer-sidebar/Header";
+import SignOut from "@/components/signin-signup/signOut";
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -44,7 +45,7 @@ export default function Home() {
       <div className="flex flex-col min-h-screen">
         {/* Header */}
         <Header isWithProfile={true} firstName="Sanchit Jain"/>
-
+        <SignOut className="bg-black text-white font-bold p-4"/>
         <main className="flex-1">
           {/* Hero Section */}
           <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-br from-orange-50 to-pink-50">

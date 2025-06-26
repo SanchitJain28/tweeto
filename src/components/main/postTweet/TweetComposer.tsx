@@ -60,7 +60,11 @@ export default function TweetComposer({ user_id }: { user_id: string }) {
       console.log("Posting tweet:", { text: tweetText, image: selectedImage });
 
       try {
-        const image_url = await handleImageUpload();
+        let image_url = null;
+        
+        if (selectedImage) {
+          image_url = await handleImageUpload();
+        }
 
         const { data } = await axios.post("/api/post-tweet", {
           profile_id: user_id,
@@ -107,7 +111,10 @@ export default function TweetComposer({ user_id }: { user_id: string }) {
 
             {isImageUploading && (
               <div className="absolute inset-0 flex items-center justify-center bg-white/30 backdrop-blur-sm rounded-lg">
-                <LoadingSpinner isVisible={isImageUploading} className="h-8 w-8 text-blue-500" />
+                <LoadingSpinner
+                  isVisible={isImageUploading}
+                  className="h-8 w-8 text-blue-500"
+                />
               </div>
             )}
 

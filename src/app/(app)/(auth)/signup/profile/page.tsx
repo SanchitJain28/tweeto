@@ -18,19 +18,52 @@ import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+
 interface FormData {
   username: string;
   displayName: string;
   bio?: string;
 }
+
 export default function CreateProfile() {
-  const { register, handleSubmit } = useForm<FormData>();
+  const { 
+    register, 
+    handleSubmit, 
+    formState: { errors },
+  } = useForm<FormData>();
+  
   const [username, setUsername] = useState<string>("");
   const [isUsernameTaken, setIsUsernameTaken] = useState<boolean | null>(null);
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
   const debouncedSearchTerm = useDebounce(username, 300);
+
+  // Username validation function
+  const validateUsername = (value: string) => {
+    // Check for spaces
+    if (value.includes(' ')) {
+      return "Username cannot contain spaces";
+    }
+    
+    // Check for uppercase letters
+    if (value !== value.toLowerCase()) {
+      return "Username cannot contain uppercase letters";
+    }
+    
+    // Check for special characters (only underscore and numbers are allowed)
+    const validPattern = /^[a-z0-9_]+$/;
+    if (!validPattern.test(value)) {
+      return "Username can only contain lowercase letters, numbers, and underscores";
+    }
+    
+    // Check minimum length
+    if (value.length < 3) {
+      return "Username must be at least 3 characters long";
+    }
+    
+    return true;
+  };
 
   const getUser = async () => {
     try {
@@ -50,11 +83,19 @@ export default function CreateProfile() {
     getUser();
   }, []);
 
-  
-
   const createNewProfile = async (data: FormData) => {
     console.log(data);
     console.log(user?.id);
+    
+    // Don't proceed if username is taken
+    if (isUsernameTaken) {
+      toast("Please choose a different username", {
+        position: "bottom-center",
+        type: "error",
+      });
+      return;
+    }
+    
     try {
       const { error } = await supabase.from("profiles").insert({
         id: user?.id,
@@ -67,14 +108,14 @@ export default function CreateProfile() {
           toast(
             <div>
               <p className="text-lg font-bold">
-                Profile already exists ,Redirecting you to home page
+                Profile already exists, Redirecting you to home page
               </p>
             </div>
           );
           setTimeout(() => {
             router.replace("/");
           }, 1500);
-          return
+          return;
         }
       }
       toast("Profile created successfully!", {
@@ -84,7 +125,6 @@ export default function CreateProfile() {
       router.push("/");
     } catch (error) {
       console.log(error);
-      
     }
   };
 
@@ -116,11 +156,18 @@ export default function CreateProfile() {
   useEffect(() => {
     const checkUsername = async () => {
       if (debouncedSearchTerm) {
-        const isTaken = await checkForUsername();
-        if (isTaken) {
-          console.log("Username is taken");
+        // Only check availability if username passes validation
+        const validation = validateUsername(debouncedSearchTerm);
+        if (validation === true) {
+          const isTaken = await checkForUsername();
+          if (isTaken) {
+            console.log("Username is taken");
+          } else {
+            console.log("Username is available");
+          }
         } else {
-          console.log("Username is available");
+          // Reset availability check if validation fails
+          setIsUsernameTaken(null);
         }
       }
     };
@@ -147,30 +194,57 @@ export default function CreateProfile() {
 
               <Input
                 id="username"
-                {...register("username")}
-                placeholder="your-username"
+                {...register("username", {
+                  required: "Username is required",
+                  validate: validateUsername
+                })}
+                placeholder="your_username"
                 onChange={(e) => setUsername(e.target.value)}
-                className="pl-8 pr-10"
-                required
+                className={`pl-8 pr-10 ${errors.username ? 'border-red-500 focus:border-red-500' : ''}`}
               />
             </div>
-            <p
-              className={`text-black text-sm -mt-2 ${isUsernameTaken === null ? "text-gray-500" : isUsernameTaken ? "text-red-500" : "text-green-500"}`}
-            >
-              {isUsernameTaken === null
-                ? ""
-                : isUsernameTaken
-                  ? "Username is taken"
-                  : "Username is available"}
-            </p>
+            
+            {/* Validation error message */}
+            {errors.username && (
+              <p className="text-red-500 text-sm -mt-2">
+                {errors.username.message}
+              </p>
+            )}
+            
+            {/* Username availability message */}
+            {!errors.username && (
+              <p
+                className={`text-sm -mt-2 ${
+                  isUsernameTaken === null 
+                    ? "text-gray-500" 
+                    : isUsernameTaken 
+                      ? "text-red-500" 
+                      : "text-green-500"
+                }`}
+              >
+                {isUsernameTaken === null
+                  ? "Username can contain lowercase letters, numbers, and underscores only"
+                  : isUsernameTaken
+                    ? "Username is taken"
+                    : "Username is available"}
+              </p>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="displayName">Display Name</Label>
               <Input
                 id="displayName"
-                {...register("displayName")}
+                {...register("displayName", {
+                  required: "Display name is required"
+                })}
                 placeholder="Your full name"
-                required
+                className={errors.displayName ? 'border-red-500 focus:border-red-500' : ''}
               />
+              {errors.displayName && (
+                <p className="text-red-500 text-sm">
+                  {errors.displayName.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -184,8 +258,12 @@ export default function CreateProfile() {
               />
             </div>
 
-            <Button type="submit" className="w-full">
-              {"Create Profile"}
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={!!errors.username || isUsernameTaken === true}
+            >
+              Create Profile
             </Button>
           </form>
         </CardContent>

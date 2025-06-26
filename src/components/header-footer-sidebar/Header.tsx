@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import NotificationBell from "../Like-comment/NotificationBell";
 import Link from "next/link";
+import { useNotification } from "@/hooks/useNotification";
 
 interface BaseProps {
   avatarUrl?: string;
@@ -23,6 +24,7 @@ export default function Header({
   avatarUrl,
   isWithProfile = false,
 }: ProfileHeaderProps) {
+  const {unreadCount} = useNotification()
   const displayName = firstName || "User";
   const initials = firstName ? `${firstName[0]}$` : firstName?.[0] || "U";
 
@@ -50,7 +52,7 @@ export default function Header({
 
           <div className="">
             <Link href="/notifications">
-              <NotificationBell size={30} className="flex items-center" />
+              <NotificationBell size={30} className="flex items-center" unreadCount={unreadCount} />
             </Link>
           </div>
         </div>

@@ -323,6 +323,14 @@ export default function ProfileClient() {
                 {fullProfile.tweets_with_counts.length}
               </Badge>
             </div>
+
+            <div className="">
+              <Link href="/post-tweet">
+                <button className="bg-gradient-to-r from-[#F73394] via-[#F8326E] to-[#FA2D41] border font-bold text-white p-4 rounded-lg ">
+                  Post a tweet
+                </button>
+              </Link>
+            </div>
           </div>
 
           {fullProfile.tweets_with_counts.length === 0 ? (

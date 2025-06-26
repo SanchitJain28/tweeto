@@ -46,6 +46,7 @@ export interface Notification {
 }
 
 export interface NotificationView {
+  tweet_id:string
   notification_id: string
   recipient_id: string
   sender_id: string

@@ -11,16 +11,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Bell, Check, Trash2, User } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import Header from "@/components/header-footer-sidebar/Header";
+import Link from "next/link";
 
 const supabase = createClient();
 
 export default function NotificationPage() {
-  const { notifications } = useNotification();
+  const { notifications, setUnreadCount } = useNotification();
   const { user, loading } = useAuth();
   const [allNotification, setAllNotification] = useState<NotificationView[]>(
     []
   );
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [readNotifications, setReadNotifications] = useState<Set<string>>(
     new Set()
   );
@@ -34,8 +36,11 @@ export default function NotificationPage() {
       .select("*")
       .eq("recipient_id", user?.id);
 
+    console.log("DATA FETCHED", data);
+
     if (data) {
       setAllNotification(data);
+      setUnreadCount(data.length);
     }
 
     if (error) {
@@ -75,6 +80,7 @@ export default function NotificationPage() {
 
       if (data) {
         setAllNotification(data);
+        setUnreadCount(data.length);
       }
 
       if (error) {
@@ -119,8 +125,11 @@ export default function NotificationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header />
+
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
+
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -162,73 +171,79 @@ export default function NotificationPage() {
         ) : allNotification.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="space-y-4">
+          <div className="">
             {allNotification.map((notify) => {
               const isRead = readNotifications.has(notify.notification_id);
               return (
-                <Card
+                <Link
+                  href={`/tweet/${notify.tweet_id}`}
                   key={notify.notification_id}
-                  className={`transition-all duration-200 hover:shadow-md ${
-                    isRead ? "bg-white" : "bg-blue-50 border-blue-200"
-                  }`}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <Avatar className="h-10 w-10 flex-shrink-0">
-                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
-                          {notify.sender_username.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
+                  <Card
+                    className={`transition-all my-4 duration-200 hover:shadow-md ${
+                      isRead ? "bg-white" : "bg-blue-50 border-blue-200"
+                    }`}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <Avatar className="h-10 w-10 flex-shrink-0">
+                          <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
+                            {notify.sender_username.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="mb-2">
-                              <span className="font-semibold text-gray-900">
-                                {notify.sender_username}
-                              </span>
-                              <span className="text-gray-700 ml-1">
-                                liked your tweet
-                              </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="mb-2">
+                                <span className="font-semibold text-gray-900">
+                                  {notify.sender_username}
+                                </span>
+                                <span className="text-gray-700 ml-1">
+                                  liked your tweet
+                                </span>
+                              </div>
+                              <div className="bg-gray-50 border-l-4 border-blue-500 p-3 rounded-r-lg">
+                                <p className="text-gray-800 text-sm italic">
+                                  &ldquo;{notify.notification_text}&ldquo;
+                                </p>
+                              </div>
                             </div>
-                            <div className="bg-gray-50 border-l-4 border-blue-500 p-3 rounded-r-lg">
-                              <p className="text-gray-800 text-sm italic">
-                                &ldquo;{notify.notification_text}&ldquo;
-                              </p>
-                            </div>
-                          </div>
 
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            {!isRead && (
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => markAsRead(notify.notification_id)}
-                              className="h-8 w-8 p-0 hover:bg-gray-100"
-                              disabled={isRead}
-                            >
-                              <Check
-                                className={`h-4 w-4 ${isRead ? "text-green-600" : "text-gray-400"}`}
-                              />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                deleteNotification(notify.notification_id)
-                              }
-                              className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              {!isRead && (
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  markAsRead(notify.notification_id)
+                                }
+                                className="h-8 w-8 p-0 hover:bg-gray-100"
+                                disabled={isRead}
+                              >
+                                <Check
+                                  className={`h-4 w-4 ${isRead ? "text-green-600" : "text-gray-400"}`}
+                                />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  deleteNotification(notify.notification_id)
+                                }
+                                className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               );
             })}
           </div>
