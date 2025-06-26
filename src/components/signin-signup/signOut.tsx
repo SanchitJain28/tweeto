@@ -5,6 +5,7 @@ export default function SignOut({ className }:{className:string}) {
   const supabase = createClient();
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    return ;
   };
   return (
     <div>
