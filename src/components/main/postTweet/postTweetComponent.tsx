@@ -16,6 +16,8 @@ export default function PostTweetPage() {
 
   const LOADING = loading || isPending;
 
+  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <Header isWithProfile={true} firstName={Profile?.full_name ?? ""} />

@@ -53,3 +53,15 @@ export interface NotificationView {
   sender_username: string
   notification_text: string
 }
+
+export interface TweetOptions {
+  text: string;
+  tone:
+    | "humorous"
+    | "inspirational"
+    | "trendy"
+    | "professional"
+    | "casual"
+    | "informative";
+  tags: string[];
+}
