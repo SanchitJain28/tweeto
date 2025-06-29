@@ -20,6 +20,15 @@ export default function AiTweetOptions({
 }: AiTweetOptionProps) {
   return (
     <div>
+      <div className="flex items-center justify-between">
+        <h4 className="font-medium text-gray-800">
+          AI Generated Tweet Options:
+        </h4>
+        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+          Target: {currentLimit} chars
+        </span>
+      </div>
+
       <div className="relative">
         {/* Loading Overlay */}
         {isAiGenerating && (
@@ -121,6 +130,10 @@ export default function AiTweetOptions({
             );
           })}
         </div>
+
+        <p className="text-xs text-gray-500 text-center">
+          💡 Click on any option to use it in your tweet
+        </p>
       </div>
     </div>
   );

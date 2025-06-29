@@ -26,6 +26,30 @@ export function useTweet({ id }: { id: string }) {
     queryKey: ["tweet", id],
     queryFn: () => FetchSingleTweet(id),
     staleTime: 0,
-    gcTime: 0
+    gcTime: 0,
+  });
+}
+
+export async function FetchTweets(): Promise<Tweet[]> {
+  try {
+    const { data, error } = await supabase.from("tweets").select("*").limit(50);
+
+    if (error) {
+      console.log(error);
+      throw error;
+    }
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export function useTweets() {
+  return useQuery<Tweet[]>({
+    queryKey: ["tweets"],
+    queryFn: FetchTweets,
+    staleTime: 0,
+    gcTime: 0,
   });
 }

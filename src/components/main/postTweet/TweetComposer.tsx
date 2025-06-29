@@ -5,7 +5,15 @@ import type React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ImageIcon, Send, X, Sparkles, Plus, Copy, Loader2 } from "lucide-react";
+import {
+  ImageIcon,
+  Send,
+  X,
+  Sparkles,
+  Plus,
+  Copy,
+  Loader2,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -294,15 +302,6 @@ export default function TweetComposer({ user_id }: { user_id: string }) {
                 ) : (
                   <>
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-gray-800">
-                          AI Generated Tweet Options:
-                        </h4>
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                          Target: {characterLimit} chars
-                        </span>
-                      </div>
-
                       <AiTweetOptions
                         isAiGenerating={isAiGenerating}
                         aiTweetOptions={aiTweetOptions}
@@ -310,10 +309,6 @@ export default function TweetComposer({ user_id }: { user_id: string }) {
                         currentLimit={characterLimit}
                         selectedTweetIndex={selectedTweetIndex}
                       />
-
-                      <p className="text-xs text-gray-500 text-center">
-                        💡 Click on any option to use it in your tweet
-                      </p>
                     </div>
 
                     <div className="flex gap-2 flex-wrap pt-2 border-t border-gray-100">

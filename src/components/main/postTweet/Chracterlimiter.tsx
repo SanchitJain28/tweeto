@@ -45,9 +45,7 @@ export default function Chracterlimiter({
           max={600}
           step={10}
           value={[characterLimit]}
-          onValueChange={(value) => {
-            onChange(value[0]);
-          }}
+          onValueChange={(value) => onChange(value[0])}
           className="w-full"
           disabled={isAiGenerating}
         />

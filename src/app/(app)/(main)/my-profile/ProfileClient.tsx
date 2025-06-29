@@ -28,6 +28,7 @@ import { DeleteTweetModal } from "./deleteModal";
 import axios from "axios";
 import LikeButton from "@/components/Like-comment/LikeButton";
 import Link from "next/link";
+import FollowButton from "@/components/Like-comment/FollowButton";
 
 export default function ProfileClient() {
   const { user } = useAuth();
@@ -264,6 +265,8 @@ export default function ProfileClient() {
                   >
                     {fullProfile.tweets_with_counts.length} tweets
                   </Badge>
+
+                  <FollowButton user_id={user.id} isFollowing={false}/>
                 </div>
               </div>
             </div>
