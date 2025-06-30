@@ -4,22 +4,30 @@ import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { createContext, useEffect, useState } from "react";
 
+export interface Profile {
+  created_at: Date;
+  id: string;
+  username: string;
+  bio: string;
+  full_name: string;
+}
+
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  profile: Profile | null;
 }
 
 export const authContext = createContext<AuthContextType | null>(null);
 
 export function AuthContext({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const supabase = createClient();
 
-  
-
-   const signOut = async () => {
+  const signOut = async () => {
     setLoading(true);
     try {
       await supabase.auth.signOut();
@@ -29,6 +37,24 @@ export function AuthContext({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getProfile = async (id: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", id)
+        .single();
+      if (error) {
+        setProfile(null);
+      }
+      setProfile(data);
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
   };
 
   const getSession = async () => {
@@ -63,6 +89,7 @@ export function AuthContext({ children }: { children: React.ReactNode }) {
       try {
         if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
           setUser(session?.user ?? null);
+          getProfile(session?.user.id ?? "");
         } else if (event === "SIGNED_OUT") {
           setUser(null);
         }
@@ -78,8 +105,14 @@ export function AuthContext({ children }: { children: React.ReactNode }) {
     };
   }, [supabase.auth]);
 
+  useEffect(() => {
+    if (user) {
+      getProfile(user.id);
+    }
+  }, [user?.id]);
+
   return (
-    <authContext.Provider value={{ user, loading,signOut}}>
+    <authContext.Provider value={{ user, loading, signOut, profile }}>
       {children}
     </authContext.Provider>
   );

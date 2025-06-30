@@ -39,7 +39,7 @@ export function NotificationProvider({
       .select("*")
       .eq("recipient_id", user?.id);
 
-    console.log(data, error);
+    // console.log(data, error);
 
     if (data) {
       setNotifications(data);

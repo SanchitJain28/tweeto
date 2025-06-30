@@ -1530,7 +1530,7 @@ export async function POST() {
   //   }
 
   const { data, error } = await await supabase.auth.admin.listUsers({
-    page :1,
+    page :2,
     perPage:50
   });
 
