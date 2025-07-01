@@ -1,13 +1,13 @@
 "use client";
 
 import LikeButton from "@/components/Like-comment/LikeButton";
+import SaveButton from "@/components/Like-comment/SaveButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageCircle, Share, Bookmark, MoreHorizontal } from "lucide-react";
+import { MessageCircle, Share, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 
 export interface FeedTweet {
   id: string;
@@ -46,19 +46,6 @@ export default function PostFeed({
   tweets: FeedTweet[];
   user_id: string;
 }) {
-  const [savedPosts, setSavedPosts] = useState<Set<string>>(new Set());
-
-  const handleSave = (postId: string) => {
-    setSavedPosts((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId);
-      } else {
-        newSet.add(postId);
-      }
-      return newSet;
-    });
-  };
 
   return (
     <div className="space-y-3 sm:space-y-4 md:space-y-6">
@@ -180,27 +167,7 @@ export default function PostFeed({
                       </div>
 
                       {/* Save Button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleSave(post.id)}
-                        className={`rounded-full px-2 py-1.5 sm:px-3 sm:py-2 transition-all duration-200 group/btn flex-shrink-0 ${
-                          savedPosts.has(post.id)
-                            ? "text-amber-600 bg-amber-50 hover:bg-amber-100"
-                            : "text-slate-600 hover:text-amber-600 hover:bg-amber-50"
-                        }`}
-                        aria-label={
-                          savedPosts.has(post.id)
-                            ? "Remove from saved"
-                            : "Save post"
-                        }
-                      >
-                        <Bookmark
-                          className={`h-3.5 w-3.5 sm:h-4 sm:w-4 group-hover/btn:scale-110 transition-all duration-200 ${
-                            savedPosts.has(post.id) ? "fill-current" : ""
-                          }`}
-                        />
-                      </Button>
+                      <SaveButton state={false} id={post.id}/>
                     </div>
                   </div>
                 </div>

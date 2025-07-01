@@ -27,6 +27,8 @@ export interface Tweet {
 }
 
 export interface FullProfile {
+  following_count:number
+  followers_count:number
   created_at: Date;
   id: string;
   username: string;

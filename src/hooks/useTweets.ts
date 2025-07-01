@@ -1,18 +1,20 @@
 import { FeedTweet } from "@/app/(app)/(main)/feed/sections/PostFeed";
 import { Tweet } from "@/types/Types";
 import { createClient } from "@/utils/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 const supabase = createClient();
 
 interface recommended_profiles {
-  id: string
-  username: string
+  id: string;
+  username: string;
 }
 
-interface Feed {
-  recommended_profiles : recommended_profiles[]
-  tweets : FeedTweet[]
+interface FeedPage {
+  tweets: FeedTweet[];
+  recommended_profiles: recommended_profiles[];
+  nextCursor?: number;
+  hasMore: boolean;
 }
 
 async function FetchSingleTweet(id: string): Promise<Tweet> {
@@ -41,39 +43,71 @@ export function useTweet({ id }: { id: string }) {
   });
 }
 
-export async function FetchTweets(): Promise<Feed> {
+export async function fetchFeedPage({
+  pageParam = 0,
+  pageSize = 10,
+}: {
+  pageParam?: number;
+  pageSize?: number;
+}): Promise<FeedPage> {
   try {
     const { data, error } = await supabase.rpc("get_feed_by_user_id", {
-      p_page_count: 10, // Number of tweets to fetch
-      p_offset: 20, // Skip the first 20 tweets (page 3)
+      p_page_count: pageSize,
+      p_offset: pageParam,
     });
 
     if (error) {
       console.error("Error fetching feed:", error);
-      throw error;
-    } 
+      throw new Error(error.message || "Failed to fetch feed");
+    }
 
-    // Assume the RPC returns an object with 'tweets' and 'recommended_profiles' properties.
-    // If not, adjust the mapping accordingly.
+    // Validate the response structure
+    if (!data) {
+      throw new Error("No data returned from feed query");
+    }
+
+    const tweets = data?.tweets ?? [];
+    const recommended_profiles = data?.recommended_profiles ?? [];
+
     return {
-      tweets: data?.tweets ?? [],
-      recommended_profiles: data?.recommended_profiles ?? []
+      tweets,
+      recommended_profiles,
+      nextCursor: tweets.length === pageSize ? pageParam + pageSize : undefined,
+      hasMore: tweets.length === pageSize,
     };
   } catch (error) {
-    console.log(error);
+    console.error("Error in fetchFeedPage:", error);
     throw error;
   }
 }
 
-export function useFeed() {
-  return useQuery<Feed>({
-    queryKey: ["tweets"],
-    queryFn: () => FetchTweets(),
-    staleTime: 0,
-    gcTime: 0,
+export function useFeed(pageSize: number = 10) {
+  return useInfiniteQuery<FeedPage>({
+    queryKey: ["feed", pageSize],
+    queryFn: ({ pageParam }) =>
+      fetchFeedPage({
+        pageParam: pageParam as number,
+        pageSize,
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    staleTime: 1000 * 60 * 5, // 5 minutes - adjust as needed
+    gcTime: 1000 * 60 * 10, // 10 minutes - adjust as needed
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 }
 
-// async function getPersonalizedFeed(id:string) {
-//   const {} = await supabase
-// }
+export function useFeedData() {
+  const query = useFeed();
+
+  const allTweets = query.data?.pages.flatMap((page) => page.tweets) ?? [];
+  const recommendedProfiles = query.data?.pages[0]?.recommended_profiles ?? [];
+
+  return {
+    ...query,
+    tweets: allTweets,
+    recommendedProfiles,
+    totalTweets: allTweets.length,
+  };
+}

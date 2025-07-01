@@ -66,7 +66,24 @@ TOPIC: ${prompt}
 Generate 3 tweets that are ready to post, engaging, and capture different audience segments.`;
 
     const { object: tweets } = await generateObject({
-      model: google("gemini-2.0-flash-lite"),
+      model: google("gemini-2.0-flash-lite", {
+        safetySettings: [
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+          {
+            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold: "BLOCK_NONE",
+          },
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+          {
+            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold: "BLOCK_NONE",
+          },
+          {
+            category: "HARM_CATEGORY_CIVIC_INTEGRITY",
+            threshold: "BLOCK_NONE",
+          },
+        ],
+      }),
       output: "array",
       schema: z.object({
         text: z.string(),

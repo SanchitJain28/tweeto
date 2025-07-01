@@ -12,10 +12,25 @@ interface Tweet {
   tweet_id: string;
   image_url: string | null;
   created_at: string;
-  tweet_comment_count : number
-  tweet_like_count : number
-  is_liked_by_current_user : boolean
+  tweet_comment_count: number;
+  tweet_like_count: number;
+  is_liked_by_current_user: boolean;
 }
+
+export interface SavedTweet {
+  id: string;
+  profile_id: string;
+  text: string;
+  image_url: string | null;
+  tags: string[];
+  like_count: number;
+  comment_count: number;
+  liked_by_current_user: boolean;
+  saved_by_current_user: boolean;
+  created_at: string;  // or Date if you plan to parse it
+  updated_at: string;  // or Date if you plan to parse it
+}
+
 
 interface UserProfile {
   bio: string;
@@ -26,7 +41,7 @@ interface UserProfile {
   followers_count: number;
   following_count: number;
   tweets: Tweet[];
-  created_at :Date
+  created_at: Date;
   is_followed_by_current_user: boolean;
 }
 
@@ -48,25 +63,14 @@ export async function getProfile(id: string): Promise<Profile> {
 }
 
 export async function getFullProfile(id: string): Promise<FullProfile> {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select(
-      `
-      *,
-      tweets_with_counts (
-        *
-      )
-    `
-    )
-    .eq("id", id)
-    .order("created_at", {
-      ascending: false,
-      referencedTable: "tweets_with_counts",
-    })
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("get_myprofile", {
+    user_id: id,
+  });
 
-  if (error) throw error;
-  return data;
+  console.log(data)
+
+  if (error) throw error
+  return data
 }
 
 export const useProfile = ({
@@ -101,12 +105,15 @@ export const useFullProfile = ({
   });
 };
 
-export async function profileWithStats(username: string):Promise<UserProfile> {
-  const { data, error } = await supabase.rpc("get_userprofile_with_stats_by_username", {
-    p_username: username,
-  }); 
+export async function profileWithStats(username: string): Promise<UserProfile> {
+  const { data, error } = await supabase.rpc(
+    "get_userprofile_with_stats_by_username",
+    {
+      p_username: username,
+    }
+  );
 
-  console.log(data)
+  console.log(data);
 
   if (error) {
     console.error("Error fetching profile with stats:", error);
@@ -123,5 +130,25 @@ export function useProfileWithStats({ username }: { username: string }) {
     staleTime: 0,
     gcTime: 0,
     enabled: !!username, // Only run if id is truthy
+  });
+}
+
+async function FetchSavedTweets(id:string) : Promise<SavedTweet[]>{
+  const {data,error}= await supabase.rpc("get_saved_tweets",{
+    current_profile_id : id
+  })
+  if(error){
+    throw error
+  }
+  return data
+}
+
+export function useSavedTweets({ id ,enabled}: { id: string, enabled : boolean }) {
+  return useQuery({
+    queryKey: ["savedTweets", id],
+    queryFn: () => FetchSavedTweets(id),
+    staleTime: 0,
+    gcTime: 0,
+    enabled, // Only run if id is truthy
   });
 }

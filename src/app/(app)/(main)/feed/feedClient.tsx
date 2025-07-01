@@ -5,13 +5,14 @@ import TrendingSection from "./sections/TrendingSection";
 import ConnectionSuggestions from "./sections/ConnectionSuggestions";
 import SearchBar from "./sections/SearchBar";
 import { useAuth } from "@/hooks/useAuth";
-import { useFeed } from "@/hooks/useTweets";
+import { useFeedData } from "@/hooks/useTweets";
 import PostFeed from "./sections/PostFeed";
 import Link from "next/link";
 import Header from "@/components/header-footer-sidebar/Header";
 import DesktopSidebar, { navigationItems } from "./sections/DesktopSidebar";
 import FeedLoadingSkeleton from "./loading-error/FeedLoading";
 import FeedErrorState from "./loading-error/FeedError";
+import { useCallback, useEffect, useRef } from "react";
 
 const trendingTopics = [
   { topic: "#WebDev", posts: "125K", growth: "+12%" },
@@ -21,19 +22,58 @@ const trendingTopics = [
   { topic: "#NextJS", posts: "23K", growth: "+30%" },
 ];
 
-interface RecommendedProfile {
-  id: string;
-  username: string;
-}
-
 export default function FeedClient() {
   // authentication
   const { user } = useAuth();
-  const { data, isLoading, error, refetch } = useFeed();
+  const {
+    tweets,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    error,
+    isLoading,
+    refetch,
+    data,
+  } = useFeedData();
 
-  const recommended_profiles: RecommendedProfile[] =
-    data?.recommended_profiles || [];
-  const tweets = data?.tweets;
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  const handleLoadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          handleLoadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentRef = loadMoreRef.current;
+
+
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [handleLoadMore]);
+
+  useEffect(() => {
+    if(tweets){
+      console.log(tweets)
+    }
+  }, [tweets])
+  
 
   // Show loading state while user authentication is being checked
   if (!user) return <FeedLoadingSkeleton />;
@@ -88,6 +128,43 @@ export default function FeedClient() {
 
           {/* Posts Feed */}
           <PostFeed tweets={tweets ?? []} user_id={user.id} />
+
+          {/* Infinite Scroll Trigger */}
+          {hasNextPage && (
+            <div
+              ref={loadMoreRef}
+              className="flex justify-center py-4"
+            >
+              {isFetchingNextPage ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+                  <span className="text-slate-600">Loading more tweets...</span>
+                </div>
+              ) : (
+                <Button
+                  onClick={handleLoadMore}
+                  variant="outline"
+                  className="text-purple-600 border-purple-600 hover:bg-purple-50"
+                >
+                  Load more tweets
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* End of feed indicator */}
+          {!hasNextPage && tweets.length > 0 && (
+            <div className="text-center py-8 text-slate-500">
+              <p>You have reached the end of your feed!</p>
+              <Button
+                onClick={() => refetch()}
+                variant="ghost"
+                className="mt-2 text-purple-600 hover:text-purple-700"
+              >
+                Refresh to see new tweets
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Desktop Right Sidebar */}
@@ -99,7 +176,7 @@ export default function FeedClient() {
           <TrendingSection trendingTopics={trendingTopics} />
 
           {/* People Suggestions - Updated to use recommended_profiles data */}
-          <ConnectionSuggestions recommendedProfiles={recommended_profiles} />
+          <ConnectionSuggestions />
         </div>
       </div>
 

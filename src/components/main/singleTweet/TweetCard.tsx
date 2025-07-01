@@ -1,128 +1,96 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { MessageCircle, Share, MoreHorizontal, Send, ImageIcon, Smile, Bookmark, BookmarkCheck } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Badge } from "@/components/ui/badge"
-import { formatDistanceToNow } from "date-fns"
-import type { Comment, Tweet } from "@/types/Types"
-import LikeButton from "@/components/Like-comment/LikeButton"
-import { CommentItem } from "@/components/Like-comment/CommentItem"
-import { createClient } from "@/utils/supabase/client"
-import { useAuth } from "@/hooks/useAuth"
-import { toast } from "react-toastify"
+import type React from "react";
+import { useState } from "react";
+import {
+  MessageCircle,
+  Share,
+  MoreHorizontal,
+  Send,
+  ImageIcon,
+  Smile
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { formatDistanceToNow } from "date-fns";
+import type { Comment, Tweet } from "@/types/Types";
+import LikeButton from "@/components/Like-comment/LikeButton";
+import { CommentItem } from "@/components/Like-comment/CommentItem";
+import { createClient } from "@/utils/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "react-toastify";
+import SaveButton from "@/components/Like-comment/SaveButton";
 
 interface TweetCardProps {
-  tweet: Tweet
+  tweet: Tweet;
 }
 
-const supabase = createClient()
+const supabase = createClient();
 
 export const TweetCard: React.FC<TweetCardProps> = ({ tweet }) => {
-  const [showComments, setShowComments] = useState(false)
-  const [newComment, setNewComment] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [tweetData, setTweetData] = useState<Tweet>(tweet)
-  const [isSaved, setIsSaved] = useState(false)
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [tweetData, setTweetData] = useState<Tweet>(tweet);
 
-  const { user, loading } = useAuth()
+  const { user, loading } = useAuth();
 
   const timeAgo = formatDistanceToNow(new Date(tweet.created_at), {
     addSuffix: true,
-  })
+  });
 
   const handleUiUpdate = (comment: Comment) => {
     setTweetData((prev) => {
-      const updatedComments = [...(prev.comments || []), comment]
-      return { ...prev, comments: updatedComments }
-    })
-    setNewComment("")
-  }
+      const updatedComments = [...(prev.comments || []), comment];
+      return { ...prev, comments: updatedComments };
+    });
+    setNewComment("");
+  };
 
   const handleSubmitComment = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newComment.trim() || isSubmitting || !user) return
+    e.preventDefault();
+    if (!newComment.trim() || isSubmitting || !user) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       const { error } = await supabase.from("tweet_replies").insert({
         tweet_id: tweet.id,
         profile_id: user.id,
         text: newComment.trim(),
-      })
+      });
 
       if (error) {
-        toast.error("Failed to post comment. Please try again.")
-        return
+        toast.error("Failed to post comment. Please try again.");
+        return;
       }
 
       handleUiUpdate({
         user_id: user.id,
         text: newComment.trim(),
         created_at: new Date(),
-      })
+      });
 
-      toast.success("Comment posted successfully!")
+      toast.success("Comment posted successfully!");
     } catch (error) {
-      console.error("Error submitting comment:", error)
-      toast.error("An unexpected error occurred. Please try again.")
+      console.error("Error submitting comment:", error);
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const handleSaveTweet = async () => {
-    if (!user || isSaving) return
 
-    setIsSaving(true)
-
-    try {
-      if (isSaved) {
-        // Remove from saved tweets
-        const { error } = await supabase.from("saved_tweets").delete().eq("tweet_id", tweet.id).eq("user_id", user.id)
-
-        if (error) {
-          toast.error("Failed to remove tweet from saved items.")
-          return
-        }
-
-        setIsSaved(false)
-        toast.success("Tweet removed from saved items.")
-      } else {
-        // Add to saved tweets
-        const { error } = await supabase.from("saved_tweets").insert({
-          tweet_id: tweet.id,
-          user_id: user.id,
-        })
-
-        if (error) {
-          toast.error("Failed to save tweet.")
-          return
-        }
-
-        setIsSaved(true)
-        toast.success("Tweet saved successfully!")
-      }
-    } catch (error) {
-      console.error("Error saving tweet:", error)
-      toast.error("An unexpected error occurred. Please try again.")
-    } finally {
-      setIsSaving(false)
-    }
-  }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-      handleSubmitComment(e)
+      handleSubmitComment(e);
     }
-  }
+  };
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -131,22 +99,22 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet }) => {
           title: `Tweet by ${tweetData.user_name}`,
           text: tweetData.text,
           url: window.location.href,
-        })
+        });
       } catch (error) {
-        console.log(error)
+        console.log(error);
         // User cancelled sharing
       }
     } else {
       // Fallback: copy to clipboard
       try {
-        await navigator.clipboard.writeText(window.location.href)
-        toast.success("Link copied to clipboard!")
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copied to clipboard!");
       } catch (error) {
-        console.log(error)
-        toast.error("Failed to copy link.")
+        console.log(error);
+        toast.error("Failed to copy link.");
       }
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -168,20 +136,23 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet }) => {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
-  if (!user) return null
+  if (!user) return null;
 
-  const commentCount = tweetData.comments?.length || 0
-  const isCommentLimitReached = newComment.length > 280
+  const commentCount = tweetData.comments?.length || 0;
+  const isCommentLimitReached = newComment.length > 280;
 
   return (
     <Card className="max-w-2xl mx-auto shadow-sm hover:shadow-md transition-all duration-300 border-0 bg-card group">
       <CardHeader className="pb-3">
         <div className="flex items-start space-x-3">
           <Avatar className="w-12 h-12 ring-2 ring-background shadow-sm transition-transform group-hover:scale-105">
-            <AvatarImage src={`/placeholder.svg?height=48&width=48`} alt={`${tweetData.user_name}'s avatar`} />
+            <AvatarImage
+              src={`/placeholder.svg?height=48&width=48`}
+              alt={`${tweetData.user_name}'s avatar`}
+            />
             <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
               {tweetData.user_name?.slice(0, 2).toUpperCase() || "U"}
             </AvatarFallback>
@@ -192,10 +163,19 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet }) => {
                 {tweetData.user_name || "Anonymous User"}
               </h3>
               <span className="text-muted-foreground text-sm">
-                @{tweetData.user_name?.toLowerCase().replace(/\s+/g, "") || "anonymous"}
+                @
+                {tweetData.user_name?.toLowerCase().replace(/\s+/g, "") ||
+                  "anonymous"}
               </span>
               <span className="text-muted-foreground">·</span>
-              <time className="text-muted-foreground text-sm" dateTime={typeof tweetData.created_at === "string" ? tweetData.created_at : tweetData.created_at.toISOString()}>
+              <time
+                className="text-muted-foreground text-sm"
+                dateTime={
+                  typeof tweetData.created_at === "string"
+                    ? tweetData.created_at
+                    : tweetData.created_at.toISOString()
+                }
+              >
                 {timeAgo}
               </time>
             </div>
@@ -214,7 +194,9 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet }) => {
       <CardContent className="pt-0">
         {/* Tweet Content */}
         <div className="mb-4">
-          <p className="text-foreground leading-relaxed whitespace-pre-wrap text-[15px] mb-3">{tweetData.text}</p>
+          <p className="text-foreground leading-relaxed whitespace-pre-wrap text-[15px] mb-3">
+            {tweetData.text}
+          </p>
           {tweetData.image_url && (
             <div className="mt-4 rounded-2xl overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
               <img
@@ -261,24 +243,7 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet }) => {
             </div>
           </Button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSaveTweet}
-            disabled={isSaving}
-            className="flex items-center space-x-2 text-muted-foreground hover:text-amber-600 transition-colors group/save"
-            aria-label={isSaved ? "Remove from saved" : "Save tweet"}
-          >
-            <div className="p-2 rounded-full group-hover/save:bg-amber-50 transition-colors">
-              {isSaving ? (
-                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-              ) : isSaved ? (
-                <BookmarkCheck className="w-5 h-5 text-amber-600" />
-              ) : (
-                <Bookmark className="w-5 h-5" />
-              )}
-            </div>
-          </Button>
+          <SaveButton id={tweet.id} state={false}/>
         </div>
 
         {/* Comments Section */}
@@ -290,7 +255,10 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet }) => {
             <form onSubmit={handleSubmitComment} className="mb-6">
               <div className="flex items-start space-x-3">
                 <Avatar className="w-10 h-10 ring-2 ring-background shadow-sm">
-                  <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt="Your avatar" />
+                  <AvatarImage
+                    src={`/placeholder.svg?height=40&width=40`}
+                    alt="Your avatar"
+                  />
                   <AvatarFallback className="bg-gradient-to-br from-green-500 to-blue-600 text-white font-semibold">
                     {user.email?.slice(0, 2).toUpperCase() || "ME"}
                   </AvatarFallback>
@@ -308,7 +276,12 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet }) => {
                       aria-describedby="comment-help"
                     />
                     <div className="absolute bottom-2 right-2">
-                      <Badge variant={isCommentLimitReached ? "destructive" : "secondary"} className="text-xs">
+                      <Badge
+                        variant={
+                          isCommentLimitReached ? "destructive" : "secondary"
+                        }
+                        className="text-xs"
+                      >
                         {newComment.length}/280
                       </Badge>
                     </div>
@@ -339,7 +312,11 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet }) => {
                     <Button
                       type="submit"
                       size="sm"
-                      disabled={!newComment.trim() || isSubmitting || isCommentLimitReached}
+                      disabled={
+                        !newComment.trim() ||
+                        isSubmitting ||
+                        isCommentLimitReached
+                      }
                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (
@@ -353,7 +330,10 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet }) => {
                     </Button>
                   </div>
 
-                  <p id="comment-help" className="text-xs text-muted-foreground">
+                  <p
+                    id="comment-help"
+                    className="text-xs text-muted-foreground"
+                  >
                     Press Cmd+Enter to post • Be respectful and constructive
                   </p>
                 </div>
@@ -395,5 +375,5 @@ export const TweetCard: React.FC<TweetCardProps> = ({ tweet }) => {
         )}
       </CardContent>
     </Card>
-  )
-}
+  );
+};
