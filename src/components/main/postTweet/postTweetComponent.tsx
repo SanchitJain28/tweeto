@@ -3,24 +3,16 @@
 import Header from "@/components/header-footer-sidebar/Header";
 import LoadingBackdrop from "@/components/loading/loadingBackdrop";
 
-import { useAuth, useProfile } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { Sparkles, TrendingUp } from "lucide-react";
 import TweetComposer from "./TweetComposer";
 
 export default function PostTweetPage() {
   const { user, loading } = useAuth();
-  const { data: Profile, isPending } = useProfile({
-    id: user?.id ?? "",
-    enabled: !loading,
-  });
-
-  const LOADING = loading || isPending;
-
-  
-
+  const LOADING = loading;
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <Header isWithProfile={true} firstName={Profile?.full_name ?? ""} />
+      <Header />
 
       <main className="max-w-2xl mx-auto px-4 py-8">
         <div className="mb-8">
@@ -33,7 +25,7 @@ export default function PostTweetPage() {
           </p>
         </div>
 
-        <TweetComposer user_id={user?.id || ""}/>
+        <TweetComposer user_id={user?.id || ""} />
 
         <div className="mt-8 bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
           <div className="flex items-center gap-2 mb-3">

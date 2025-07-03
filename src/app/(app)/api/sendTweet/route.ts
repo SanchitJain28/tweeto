@@ -1,10 +1,11 @@
-import { createClient } from "@/utils/supabase/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const supabase= await createClient();
-    const { user } = await supabase.auth.getUser();
+    return NextResponse.json(
+      { status: false, message: "Unexpected error occured" },
+      { status: 500 }
+    );
   } catch (error) {
     console.error("Error in POST /api/sendTweet:", error);
     return NextResponse.json(

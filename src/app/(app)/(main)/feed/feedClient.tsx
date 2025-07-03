@@ -15,11 +15,11 @@ import FeedErrorState from "./loading-error/FeedError";
 import { useCallback, useEffect, useRef } from "react";
 
 const trendingTopics = [
-  { topic: "#WebDev", posts: "125K", growth: "+12%" },
-  { topic: "#AI", posts: "89K", growth: "+25%" },
-  { topic: "#JavaScript", posts: "67K", growth: "+8%" },
-  { topic: "#React", posts: "45K", growth: "+15%" },
-  { topic: "#NextJS", posts: "23K", growth: "+30%" },
+  { topic: "sports", posts: "125K", growth: "+12%" },
+  { topic: "gaming", posts: "89K", growth: "+25%" },
+  { topic: "politics", posts: "67K", growth: "+8%" },
+  { topic: "food", posts: "45K", growth: "+15%" },
+  { topic: "health", posts: "23K", growth: "+30%" },
 ];
 
 export default function FeedClient() {
@@ -56,7 +56,6 @@ export default function FeedClient() {
 
     const currentRef = loadMoreRef.current;
 
-
     if (currentRef) {
       observer.observe(currentRef);
     }
@@ -69,11 +68,10 @@ export default function FeedClient() {
   }, [handleLoadMore]);
 
   useEffect(() => {
-    if(tweets){
-      console.log(tweets)
+    if (tweets) {
+      console.log(tweets);
     }
-  }, [tweets])
-  
+  }, [tweets]);
 
   // Show loading state while user authentication is being checked
   if (!user) return <FeedLoadingSkeleton />;
@@ -127,14 +125,11 @@ export default function FeedClient() {
           </Link>
 
           {/* Posts Feed */}
-          <PostFeed tweets={tweets ?? []} user_id={user.id} />
+          <PostFeed tweets={tweets} user_id={user.id} />
 
           {/* Infinite Scroll Trigger */}
           {hasNextPage && (
-            <div
-              ref={loadMoreRef}
-              className="flex justify-center py-4"
-            >
+            <div ref={loadMoreRef} className="flex justify-center py-4">
               {isFetchingNextPage ? (
                 <div className="flex items-center space-x-2">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>

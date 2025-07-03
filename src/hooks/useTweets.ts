@@ -1,7 +1,8 @@
-import { FeedTweet } from "@/app/(app)/(main)/feed/sections/PostFeed";
+import { TweetCardProps } from "@/app/(app)/(main)/feed/sections/PostFeed";
 import { Tweet } from "@/types/Types";
 import { createClient } from "@/utils/supabase/client";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const supabase = createClient();
 
@@ -11,7 +12,7 @@ interface recommended_profiles {
 }
 
 interface FeedPage {
-  tweets: FeedTweet[];
+  tweets: TweetCardProps[];
   recommended_profiles: recommended_profiles[];
   nextCursor?: number;
   hasMore: boolean;
@@ -110,4 +111,26 @@ export function useFeedData() {
     recommendedProfiles,
     totalTweets: allTweets.length,
   };
+}
+
+async function fetchFunctionsWithCategory(
+  cat: string
+): Promise<TweetCardProps[]> {
+  try {
+    const response = await axios.post(
+      `/api/fetch-tweets-by-category?category=${cat}`
+    );
+    console.log(response);
+    return response.data.tweets;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export function useTweetsWithCategory({ category }: { category: string }) {
+  return useQuery({
+    queryKey: ["tweetsOfCategory", category],
+    queryFn: () => fetchFunctionsWithCategory(category),
+  });
 }
