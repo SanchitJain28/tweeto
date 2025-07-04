@@ -18,6 +18,12 @@ interface FeedPage {
   hasMore: boolean;
 }
 
+// interface CategoryTweets {
+//   tweets: TweetCardProps[];
+//   nextCursor?: number;
+//   hasMore: boolean;
+// }
+
 async function FetchSingleTweet(id: string): Promise<Tweet> {
   try {
     const { data, error } = await supabase.rpc("get_tweet_with_details", {
@@ -91,7 +97,10 @@ export function useFeed(pageSize: number = 10) {
         pageSize,
       }),
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    getNextPageParam: (lastPage) => {
+      console.log(lastPage);
+      return lastPage.nextCursor;
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes - adjust as needed
     gcTime: 1000 * 60 * 10, // 10 minutes - adjust as needed
     retry: 3,
