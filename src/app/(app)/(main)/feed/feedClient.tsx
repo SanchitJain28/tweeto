@@ -14,14 +14,6 @@ import FeedLoadingSkeleton from "./loading-error/FeedLoading";
 import FeedErrorState from "./loading-error/FeedError";
 import { useCallback, useEffect, useRef } from "react";
 
-const trendingTopics = [
-  { topic: "sports", posts: "125K", growth: "+12%" },
-  { topic: "gaming", posts: "89K", growth: "+25%" },
-  { topic: "politics", posts: "67K", growth: "+8%" },
-  { topic: "food", posts: "45K", growth: "+15%" },
-  { topic: "health", posts: "23K", growth: "+30%" },
-];
-
 export default function FeedClient() {
   // authentication
   const { user } = useAuth();
@@ -67,11 +59,11 @@ export default function FeedClient() {
     };
   }, [handleLoadMore]);
 
-  useEffect(() => {
-    if (tweets) {
-      console.log(tweets);
-    }
-  }, [tweets]);
+  // useEffect(() => {
+  //   if (tweets) {
+  //     console.log(tweets);
+  //   }
+  // }, [tweets]);
 
   // Show loading state while user authentication is being checked
   if (!user) return <FeedLoadingSkeleton />;
@@ -168,7 +160,7 @@ export default function FeedClient() {
           <SearchBar />
 
           {/* Trending */}
-          <TrendingSection trendingTopics={trendingTopics} />
+          <TrendingSection />
 
           {/* People Suggestions - Updated to use recommended_profiles data */}
           <ConnectionSuggestions />

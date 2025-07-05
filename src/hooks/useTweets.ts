@@ -18,11 +18,11 @@ interface FeedPage {
   hasMore: boolean;
 }
 
-// interface CategoryTweets {
-//   tweets: TweetCardProps[];
-//   nextCursor?: number;
-//   hasMore: boolean;
-// }
+interface CategoryTweets {
+  tweets: TweetCardProps[];
+  nextCursor?: number;
+  hasMore: boolean;
+}
 
 async function FetchSingleTweet(id: string): Promise<Tweet> {
   try {
@@ -98,11 +98,10 @@ export function useFeed(pageSize: number = 10) {
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {
-      console.log(lastPage);
       return lastPage.nextCursor;
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes - adjust as needed
-    gcTime: 1000 * 60 * 10, // 10 minutes - adjust as needed
+    staleTime: 0, // 5 minutes - adjust as needed
+    gcTime: 0, // 10 minutes - adjust as needed
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -123,23 +122,59 @@ export function useFeedData() {
 }
 
 async function fetchFunctionsWithCategory(
-  cat: string
-): Promise<TweetCardProps[]> {
+  cat: string,
+  pageParam = 0,
+  pageSize = 10
+): Promise<CategoryTweets> {
   try {
     const response = await axios.post(
-      `/api/fetch-tweets-by-category?category=${cat}`
+      `/api/fetch-tweets-by-category?category=${cat}&page=${pageSize}&offset=${pageParam}`
     );
-    console.log(response);
-    return response.data.tweets;
+
+    const {
+      data: { tweets },
+    } = response;
+
+    return {
+      tweets,
+      nextCursor: tweets.length === pageSize ? pageParam + pageSize : undefined,
+      hasMore: tweets.length === pageSize,
+    };
   } catch (error) {
     console.log(error);
     throw error;
   }
 }
 
-export function useTweetsWithCategory({ category }: { category: string }) {
-  return useQuery({
+export function useTweetsWithCategory({
+  category,
+  enabled,
+}: {
+  category: string;
+  enabled: boolean;
+}) {
+  const pageSize = 10;
+  const query = useInfiniteQuery({
     queryKey: ["tweetsOfCategory", category],
-    queryFn: () => fetchFunctionsWithCategory(category),
+    queryFn: ({ pageParam }) =>
+      fetchFunctionsWithCategory(category, pageParam as number, pageSize),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      return lastPage.nextCursor;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    enabled,
+    staleTime: 0, // 5 minutes - adjust as needed
+    gcTime: 0,
   });
+
+  const CategoryTweets = query.data?.pages.flatMap((page) => {
+    return page.tweets;
+  });
+
+  console.log("Category", CategoryTweets);
+  return {
+    ...query,
+    tweets: CategoryTweets,
+  };
 }

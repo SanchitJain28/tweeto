@@ -38,23 +38,18 @@ export default function TweetCard({
 
   return (
     <div>
-      <Link href={`/profile/${post.username}`}>
+      <Link href={`/tweet/${post.id}`}>
         <Card className="group my-4 bg-white/90 backdrop-blur-md border border-slate-200/50 shadow-sm hover:shadow-lg sm:hover:shadow-xl sm:hover:shadow-slate-200/20 transition-all duration-300 sm:hover:-translate-y-1 rounded-xl sm:rounded-2xl overflow-hidden mx-2 sm:mx-0">
           <CardContent className="p-0">
             <div className="p-3 sm:p-4 md:p-6">
               <div className="flex space-x-2 sm:space-x-3 md:space-x-4">
                 {/* Avatar - Mobile First */}
-                <Link
-                  href={`/profile/${post.username}`}
-                  className="flex-shrink-0"
-                >
-                  <Avatar className="ring-1 ring-white shadow-sm hover:ring-purple-200 transition-all duration-200 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12">
-                    <AvatarImage src={""} alt={`${post.username}'s avatar`} />
-                    <AvatarFallback className="bg-gradient-to-br from-purple-500 via-blue-500 to-indigo-600 text-white font-semibold text-xs sm:text-sm md:text-base">
-                      {post.username.slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Link>
+                <Avatar className="ring-1 ring-white shadow-sm hover:ring-purple-200 transition-all duration-200 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12">
+                  <AvatarImage src={""} alt={`${post.username}'s avatar`} />
+                  <AvatarFallback className="bg-gradient-to-br from-purple-500 via-blue-500 to-indigo-600 text-white font-semibold text-xs sm:text-sm md:text-base">
+                    {post.username.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
 
                 <div className="flex-1 min-w-0">
                   {/* Header - Mobile First */}
@@ -62,11 +57,11 @@ export default function TweetCard({
                     <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 min-w-0 flex-1">
                       {/* Username and badge row */}
                       <div className="flex items-center space-x-1 sm:space-x-2 min-w-0">
-                        <Link href={`/profile/${post.username}`}>
-                          <h3 className="font-bold text-slate-900 hover:text-purple-600 cursor-pointer text-sm sm:text-base transition-colors duration-200 truncate">
-                            {post.username}
-                          </h3>
-                        </Link>
+                        {/* <Link href={`/profile/${post.username}`}> */}
+                        <h3 className="font-bold text-slate-900 hover:text-purple-600 cursor-pointer text-sm sm:text-base transition-colors duration-200 truncate">
+                          {post.username}
+                        </h3>
+                        {/* </Link> */}
                         <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs px-1.5 py-0.5 sm:px-2 rounded-full shadow-sm flex-shrink-0">
                           ✓
                         </Badge>

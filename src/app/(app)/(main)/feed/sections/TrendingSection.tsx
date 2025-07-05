@@ -4,17 +4,15 @@ import { TrendingUp } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
-interface TrendingTopic {
-  topic: string;
-}
+const trendingTopics = [
+  { topic: "sports", posts: "125K", growth: "+12%" },
+  { topic: "gaming", posts: "89K", growth: "+25%" },
+  { topic: "politics", posts: "67K", growth: "+8%" },
+  { topic: "food", posts: "45K", growth: "+15%" },
+  { topic: "health", posts: "23K", growth: "+30%" },
+];
 
-interface TrendingSectionProps {
-  trendingTopics: TrendingTopic[];
-}
-
-export default function TrendingSection({
-  trendingTopics,
-}: TrendingSectionProps) {
+export default function TrendingSection() {
   return (
     <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
       <CardHeader>

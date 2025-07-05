@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, Hash, TrendingUp } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useEffect } from "react";
 
 export interface TweetCardProps {
   id: string;
@@ -28,9 +29,24 @@ export default function CategoryClient() {
   const { user } = useAuth();
   const { category } = useParams<{ category: string }>();
 
-  const { data, isPending, isError } = useTweetsWithCategory({
+  const {
+    tweets,
+    data,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    isPending,
+    isError,
+  } = useTweetsWithCategory({
     category,
+    enabled: true,
   });
+
+  useEffect(() => {
+    if (tweets) {
+      console.log(tweets);
+    }
+  }, [tweets, data]);
 
   if (!user) {
     return (
@@ -86,7 +102,7 @@ export default function CategoryClient() {
           <div className="flex items-center gap-4 mt-4">
             <Badge variant="secondary" className="flex items-center gap-1">
               <TrendingUp className="h-3 w-3" />
-              {data?.length || 0} posts
+              {0} posts
             </Badge>
             <Badge variant="outline">#{category}</Badge>
           </div>
@@ -128,7 +144,7 @@ export default function CategoryClient() {
         )}
 
         {/* Empty State */}
-        {!isPending && !isError && (!data || data.length === 0) && (
+        {!isPending && !isError && (!tweets || tweets?.length === 0) && (
           <div className="text-center py-12">
             <div
               className={`inline-flex p-4 rounded-full ${getCategoryColor(category)} mb-4`}
@@ -147,23 +163,39 @@ export default function CategoryClient() {
         )}
 
         {/* Tweets Grid */}
-        {!isPending && !isError && data && data.length > 0 && (
+        {!isPending && !isError && tweets && tweets.length > 0 && (
           <div className="space-y-6">
-            {data.map((tweet, index) => (
+            {tweets.map((tweet, index) => (
               <TweetCard key={index} post={tweet} user_id={user.id} />
             ))}
           </div>
         )}
 
         {/* Load More Indicator */}
-        {!isPending && data && data.length > 0 && (
+        {!isPending && tweets && tweets.length > 0 && (
           <div className="text-center mt-12 py-8">
             <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
               <div className="h-px bg-border flex-1 w-16"></div>
-              <span>
-                End of {formatCategoryName(category).toLowerCase()} posts
-              </span>
-              <div className="h-px bg-border flex-1 w-16"></div>
+              {hasNextPage ? (
+                <button
+                  onClick={() => {
+                    console.log(hasNextPage);
+                    if (hasNextPage && !isFetchingNextPage) {
+                      fetchNextPage();
+                    }
+                  }}
+                  className="bg-black p-4 text-white rounded-xl"
+                >
+                  Load more
+                </button>
+              ) : (
+                <>
+                  <span>
+                    End of {formatCategoryName(category).toLowerCase()} posts
+                  </span>
+                  <div className="h-px bg-border flex-1 w-16"></div>
+                </>
+              )}
             </div>
           </div>
         )}

@@ -1,22 +1,20 @@
+"use client";
 
-"use client"
-
-import { useState } from "react"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
-import NotificationBell from "../Like-comment/NotificationBell"
-import Link from "next/link"
-import { useNotification } from "@/hooks/useNotification"
-import { useAuth } from "@/hooks/useAuth"
+import { useState } from "react";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import NotificationBell from "../Like-comment/NotificationBell";
+import Link from "next/link";
+import { useNotification } from "@/hooks/useNotification";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Menu,
   Home,
   Search,
   Bell,
-  Mail,
   Bookmark,
   User,
   Settings,
@@ -24,34 +22,46 @@ import {
   ChevronRight,
   LogIn,
   UserPlus,
-} from "lucide-react"
+} from "lucide-react";
 
 const allNavigationItems = [
   { icon: Home, label: "Home", active: false, href: "/", requiresAuth: false },
   { icon: Search, label: "Discover", href: "/discover", requiresAuth: false },
-  { icon: Bell, label: "Notifications", href: "/notifications", requiresAuth: true },
-  { icon: Mail, label: "Messages", href: "/messages", requiresAuth: true },
-  { icon: Bookmark, label: "Saved", href: "/saved", requiresAuth: true },
-  { icon: User, label: "Profile", href: "/profile", requiresAuth: true },
-  { icon: Settings, label: "Settings", href: "/settings", requiresAuth: true },
-]
+  {
+    icon: Bell,
+    label: "Notifications",
+    href: "/notifications",
+    requiresAuth: true,
+  },
+  { icon: Bookmark, label: "Saved", href: "/my-profile", requiresAuth: true },
+  { icon: User, label: "Profile", href: "/my-profile", requiresAuth: true },
+  {
+    icon: Settings,
+    label: "Settings",
+    href: "/my-profile",
+    requiresAuth: true,
+  },
+];
 
 const guestNavigationItems = [
   { icon: LogIn, label: "Sign In", href: "/signin", requiresAuth: false },
   { icon: UserPlus, label: "Sign Up", href: "/signup", requiresAuth: false },
-]
+];
 
 export default function Header() {
-  const { user, profile, loading } = useAuth()
-  const { unreadCount } = useNotification()
-  const [isOpen, setIsOpen] = useState(false)
+  const { user, profile, loading } = useAuth();
+  const { unreadCount } = useNotification();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const isSignedIn = !!user
+  const isSignedIn = !!user;
 
   // Filter navigation items based on authentication state
   const navigationItems = isSignedIn
     ? allNavigationItems.filter((item) => !item.requiresAuth || isSignedIn)
-    : [...allNavigationItems.filter((item) => !item.requiresAuth), ...guestNavigationItems]
+    : [
+        ...allNavigationItems.filter((item) => !item.requiresAuth),
+        ...guestNavigationItems,
+      ];
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -89,15 +99,21 @@ export default function Header() {
                       </>
                     ) : (
                       <>
-                        <h3 className="font-semibold text-gray-900">{profile?.username}</h3>
-                        <p className="text-sm text-gray-500">@{profile?.username.toLowerCase()}</p>
+                        <h3 className="font-semibold text-gray-900">
+                          {profile?.username}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          @{profile?.username.toLowerCase()}
+                        </p>
                       </>
                     )}
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-gray-400" />
               </div>
-              <p className="text-xs text-blue-600 mt-2 font-medium">View profile</p>
+              <p className="text-xs text-blue-600 mt-2 font-medium">
+                View profile
+              </p>
             </div>
           </Link>
           <Separator />
@@ -108,7 +124,11 @@ export default function Header() {
       <nav className="flex-1 p-4">
         <div className="space-y-2">
           {navigationItems.map((item, index) => (
-            <Link key={index} href={item.href || "#"} onClick={() => setIsOpen(false)}>
+            <Link
+              key={index}
+              href={item.href || "#"}
+              onClick={() => setIsOpen(false)}
+            >
               <Button
                 variant="ghost"
                 className={`w-full justify-start text-left h-12 px-4 text-gray-700 hover:bg-gray-50 hover:text-gray-900`}
@@ -128,10 +148,12 @@ export default function Header() {
 
       {/* Footer */}
       <div className="p-4 border-t">
-        <p className="text-xs text-gray-500 text-center">© 2024 SocialHub. All rights reserved.</p>
+        <p className="text-xs text-gray-500 text-center">
+          © 2024 SocialHub. All rights reserved.
+        </p>
       </div>
     </div>
-  )
+  );
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
@@ -142,7 +164,11 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="lg:hidden p-2 hover:bg-gray-100">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="lg:hidden p-2 hover:bg-gray-100"
+                >
                   <Menu className="h-5 w-5 text-gray-700" />
                   <span className="sr-only">Open menu</span>
                 </Button>
@@ -161,7 +187,9 @@ export default function Header() {
                   className="hidden lg:flex items-center gap-2 px-3 py-2 hover:bg-gray-100"
                 >
                   <Menu className="h-4 w-4 text-gray-700" />
-                  <span className="text-sm font-medium text-gray-700">Menu</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    Menu
+                  </span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-80 p-0">
@@ -185,10 +213,15 @@ export default function Header() {
                   className="hidden sm:flex items-center gap-3 hover:bg-gray-50 rounded-lg p-2 transition-colors"
                 >
                   <Avatar className="h-9 w-9 ring-2 ring-blue-100">
-                    <AvatarImage src={"/placeholder.svg"} alt={profile?.username} />
+                    <AvatarImage
+                      src={"/placeholder.svg"}
+                      alt={profile?.username}
+                    />
                   </Avatar>
                   <div className="hidden lg:block">
-                    <p className="text-sm font-medium text-gray-900">{profile?.username}</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {profile?.username}
+                    </p>
                     <p className="text-xs text-gray-500">View profile</p>
                   </div>
                   <ChevronRight className="hidden lg:block h-4 w-4 text-gray-400" />
@@ -207,10 +240,14 @@ export default function Header() {
             ) : (
               <>
                 <h1 className="text-lg lg:text-xl font-semibold text-gray-900 truncate">
-                  {isSignedIn ? `Welcome back, ${profile?.username}` : "Welcome to SocialHub"}
+                  {isSignedIn
+                    ? `Welcome back, ${profile?.username}`
+                    : "Welcome to SocialHub"}
                 </h1>
                 <p className="hidden sm:block text-sm text-gray-500">
-                  {isSignedIn ? "Share your thoughts with the world" : "Discover amazing content and connect with others"}
+                  {isSignedIn
+                    ? "Share your thoughts with the world"
+                    : "Discover amazing content and connect with others"}
                 </p>
               </>
             )}
@@ -235,7 +272,10 @@ export default function Header() {
                     {/* Mobile Profile Avatar */}
                     <Link href="/profile" className="sm:hidden">
                       <Avatar className="h-8 w-8 ring-2 ring-blue-100 hover:ring-blue-200 transition-all">
-                        <AvatarImage src={"/placeholder.svg"} alt={profile?.username} />
+                        <AvatarImage
+                          src={"/placeholder.svg"}
+                          alt={profile?.username}
+                        />
                       </Avatar>
                     </Link>
 
@@ -283,5 +323,5 @@ export default function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }

@@ -41,9 +41,6 @@ export default function ConnectionSuggestions() {
         console.error("Error fetching profile suggestions:", error);
         throw new Error(error.message || "Failed to fetch suggestions");
       }
-
-      console.log("Suggestions:", data);
-
       return {
         profiles: data || [],
         nextCursor: data && data.length === 10 ? pageParam + 10 : undefined,
@@ -65,7 +62,6 @@ export default function ConnectionSuggestions() {
   // Flatten all pages and filter out dismissed profiles
   const allSuggestions = data?.pages.flatMap((page) => page.profiles) || [];
 
-  
   const filteredSuggestions = allSuggestions.filter(
     (profile) => !dismissedProfiles.has(profile.id)
   );
