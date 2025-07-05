@@ -72,7 +72,7 @@ export default function UnsignedHome() {
                   className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 border-2 bg-transparent"
                   asChild
                 >
-                  <Link href="/signin">Sign In</Link>
+                  <Link href="/login">Sign In</Link>
                 </Button>
               </div>
 
