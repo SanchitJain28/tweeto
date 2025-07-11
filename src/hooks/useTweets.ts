@@ -172,7 +172,6 @@ export function useTweetsWithCategory({
     return page.tweets;
   });
 
-  console.log("Category", CategoryTweets);
   return {
     ...query,
     tweets: CategoryTweets,

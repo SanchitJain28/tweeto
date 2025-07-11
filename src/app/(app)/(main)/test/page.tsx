@@ -1,5 +1,6 @@
 "use client";
 
+import SearchBar from "@/components/header-footer-sidebar/SearchBar";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { ImageIcon, X } from "lucide-react";
@@ -65,7 +66,7 @@ export default function TestPage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    
+
     if (files.length === 0) return;
 
     const newImages: ImageFile[] = [];
@@ -82,7 +83,7 @@ export default function TestPage() {
 
         // Update state when all files are processed
         if (newImages.length === files.length) {
-          setSelectedImages(prev => [...prev, ...newImages]);
+          setSelectedImages((prev) => [...prev, ...newImages]);
         }
       };
       reader.readAsDataURL(file);
@@ -90,7 +91,7 @@ export default function TestPage() {
   };
 
   const removeImage = (id: string) => {
-    setSelectedImages(prev => prev.filter(img => img.id !== id));
+    setSelectedImages((prev) => prev.filter((img) => img.id !== id));
   };
 
   const clearAllImages = () => {
@@ -117,7 +118,7 @@ export default function TestPage() {
         {/* Image Upload Section */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
           <h2 className="text-lg font-semibold mb-4">Upload Images</h2>
-          
+
           <div className="flex items-center gap-4 mb-4">
             <label htmlFor="image-upload" className="cursor-pointer">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-blue-50 transition-colors text-blue-500 border border-blue-300">
@@ -175,26 +176,32 @@ export default function TestPage() {
             disabled={isImageUploading || selectedImages.length === 0}
             className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {isImageUploading 
-              ? `Uploading ${selectedImages.length} images...` 
-              : `Upload ${selectedImages.length} Images`
-            }
+            {isImageUploading
+              ? `Uploading ${selectedImages.length} images...`
+              : `Upload ${selectedImages.length} Images`}
           </button>
         </div>
 
         {/* Uploaded URLs Display */}
         {uploadedUrls.length > 0 && (
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Uploaded Images ({uploadedUrls.length})</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Uploaded Images ({uploadedUrls.length})
+            </h3>
             <div className="space-y-2">
               {uploadedUrls.map((url, index) => (
-                <div key={index} className="p-2 bg-gray-50 rounded text-sm break-all">
+                <div
+                  key={index}
+                  className="p-2 bg-gray-50 rounded text-sm break-all"
+                >
                   <strong>Image {index + 1}:</strong> {url}
                 </div>
               ))}
             </div>
           </div>
         )}
+
+        <SearchBar />
       </div>
     </div>
   );

@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import TrendingSection from "./sections/TrendingSection";
 import ConnectionSuggestions from "./sections/ConnectionSuggestions";
-import SearchBar from "./sections/SearchBar";
 import { useAuth } from "@/hooks/useAuth";
 import { useFeedData } from "@/hooks/useTweets";
 import PostFeed from "./sections/PostFeed";
@@ -13,6 +12,7 @@ import DesktopSidebar, { navigationItems } from "./sections/DesktopSidebar";
 import FeedLoadingSkeleton from "./loading-error/FeedLoading";
 import FeedErrorState from "./loading-error/FeedError";
 import { useCallback, useEffect, useRef } from "react";
+import SearchBar from "@/components/header-footer-sidebar/SearchBar";
 
 export default function FeedClient() {
   // authentication
@@ -89,10 +89,10 @@ export default function FeedClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br  from-slate-50 to-blue-50">
       <Header />
 
-      <div className="max-w-7xl mx-auto flex gap-6 p-4">
+      <div className="max-w-6xl mx-auto gap-6 p-4">
         {/* Desktop Sidebar */}
         <DesktopSidebar />
 
@@ -110,11 +110,20 @@ export default function FeedClient() {
             </Card>
           </div>
 
+          <div className="my-2">
+            <SearchBar />
+          </div>
+
           <Link href={"/post-tweet"}>
             <button className="w-full text-lg my-2 border p-2 rounded-lg bg-gradient-to-r from-[#B148FF] via-[#C029B5] to-[#DE0183] text-white">
               Post a tweet
             </button>
           </Link>
+
+          <div className="space-y-6 my-4">
+            {/* Who to Follow */}
+            <ConnectionSuggestions isHorizontal={true} />
+          </div>
 
           {/* Posts Feed */}
           <PostFeed tweets={tweets} user_id={user.id} />
@@ -157,7 +166,6 @@ export default function FeedClient() {
         {/* Desktop Right Sidebar */}
         <div className="hidden xl:block w-80 sticky top-4 h-fit space-y-6">
           {/* Search */}
-          <SearchBar />
 
           {/* Trending */}
           <TrendingSection />

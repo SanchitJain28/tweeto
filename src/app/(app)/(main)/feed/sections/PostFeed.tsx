@@ -1,6 +1,7 @@
 "use client";
 import TweetCard from "@/components/main/feed/TweetCard";
 import Link from "next/link";
+import ConnectionSuggestions from "./ConnectionSuggestions";
 export interface TweetCardProps {
   id: string;
   created_at: string; // ISO date string
@@ -29,11 +30,24 @@ export default function PostFeed({
 }) {
   return (
     <div className="space-y-3 sm:space-y-4 md:space-y-6">
-      {tweets.map((post) => (
-        <Link key={post.id} href={`/tweet/${post.id}`}>
-          <TweetCard post={post} user_id={user_id} />
-        </Link>
-      ))}
+      {tweets.map((post, index) => {
+        return (
+          <div className="" key={index}>
+            {index % 10 === 0 && index !== 0 ? (
+              <div className="flex flex-col">
+                <Link href={`/tweet/${post.id}`}>
+                  <TweetCard post={post} user_id={user_id} />
+                </Link>
+                <ConnectionSuggestions isHorizontal={true} />
+              </div>
+            ) : (
+              <Link href={`/tweet/${post.id}`}>
+                <TweetCard post={post} user_id={user_id} />
+              </Link>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

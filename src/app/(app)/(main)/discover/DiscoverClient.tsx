@@ -1,8 +1,6 @@
 "use client";
 
-import { Search, TrendingUp } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Header from "@/components/header-footer-sidebar/Header";
@@ -12,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import ConnectionSuggestions from "../feed/sections/ConnectionSuggestions";
 import { Button } from "@/components/ui/button";
 import TrendingSection from "../feed/sections/TrendingSection";
+import SearchBar from "@/components/header-footer-sidebar/SearchBar";
 
 export default function DiscoverClient() {
   const [activeTab, setActiveTab] = useState("for-you");
@@ -62,16 +61,6 @@ export default function DiscoverClient() {
     { id: "news", label: "News" },
     { id: "sports", label: "Sports" },
     { id: "entertainment", label: "Entertainment" },
-  ];
-
-  const trendingTopics = [
-    { topic: "sports", posts: "125K" },
-    { topic: "gaming", posts: "89K" },
-    { topic: "politics", posts: "156K" },
-    { topic: "food", posts: "67K" },
-    { topic: "health", posts: "43K" },
-    { topic: "technology", posts: "201K" },
-    { topic: "entertainment", posts: "178K" },
   ];
 
   const renderTabContent = () => {
@@ -219,48 +208,14 @@ export default function DiscoverClient() {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Search Bar */}
-            <div className="mb-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search accounts, topics, or posts..."
-                  className="pl-10 h-12 text-base"
-                />
-              </div>
+            <div className="my-2">
+              <SearchBar />
             </div>
 
-            {/* Trending Topics Section */}
-            <Card className="mb-6">
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <TrendingUp className="h-5 w-5 text-orange-500" />
-                  <h3 className="font-semibold">Trending Now</h3>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {trendingTopics.slice(0, 6).map((topic, index) => (
-                    <div
-                      key={topic.topic}
-                      className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 cursor-pointer border"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <span className="text-sm font-medium text-muted-foreground">
-                          #{index + 1}
-                        </span>
-                        <div>
-                          <p className="font-medium text-sm">#{topic.topic}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {topic.posts} posts
-                          </p>
-                        </div>
-                      </div>
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="space-y-6 my-4">
+              {/* Who to Follow */}
+              <ConnectionSuggestions isHorizontal={true} />
+            </div>
 
             {/* Moving Tabs Menu */}
             <div className="mb-6">
