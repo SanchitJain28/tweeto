@@ -20,6 +20,8 @@ export default function LeftSidebar({
       .slice(0, 2);
   };
 
+  if (!fullProfile.tweets_with_counts) return;
+
   return (
     <div className="lg:col-span-3">
       <div className="space-y-6">
@@ -52,13 +54,17 @@ export default function LeftSidebar({
                 </div>
                 <Link href={`/profile/${fullProfile.username}/followers`}>
                   <div className="p-4 border rounded-xl">
-                    <div className="font-semibold text-gray-900">{fullProfile.followers_count}</div>
+                    <div className="font-semibold text-gray-900">
+                      {fullProfile.followers_count}
+                    </div>
                     <div className="text-xs  text-gray-500">Followers</div>
                   </div>
                 </Link>
                 <Link href={`/profile/${fullProfile.username}/following`}>
                   <div className="p-4 border rounded-xl">
-                    <div className="font-semibold text-gray-900">{fullProfile.following_count}</div>
+                    <div className="font-semibold text-gray-900">
+                      {fullProfile.following_count}
+                    </div>
                     <div className="text-xs  text-gray-500">Following</div>
                   </div>
                 </Link>

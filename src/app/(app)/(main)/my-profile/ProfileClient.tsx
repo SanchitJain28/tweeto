@@ -45,13 +45,6 @@ export default function ProfileClient() {
 
   const [activeTab, setActiveTab] = useState("Your Tweets");
 
-  useEffect(() => {
-    if (fullProfile) {
-      console.log(activeTab)
-      console.log(fullProfile);
-    }
-  }, [fullProfile]);
-
   const handleUpdate = (change: {
     id: string;
     text: string;
@@ -103,6 +96,7 @@ export default function ProfileClient() {
 
   useEffect(() => {
     if (fullProfile) {
+      console.log("FULL PROFILE", fullProfile);
       setLocalProfile(fullProfile);
     }
   }, [fullProfile]);
@@ -117,7 +111,7 @@ export default function ProfileClient() {
 
   if (isError) return <ProfileError />;
 
-  if (!fullProfile) return <ProfileError />;
+  if (!fullProfile || !localProfile) return <ProfileError />;
 
   if (isPending) return <ProfileLoading />;
 

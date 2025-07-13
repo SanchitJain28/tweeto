@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader } from "@/components/ui/card";
 import TrendingSection from "./sections/TrendingSection";
 import ConnectionSuggestions from "./sections/ConnectionSuggestions";
 import { useAuth } from "@/hooks/useAuth";
@@ -59,12 +58,6 @@ export default function FeedClient() {
     };
   }, [handleLoadMore]);
 
-  // useEffect(() => {
-  //   if (tweets) {
-  //     console.log(tweets);
-  //   }
-  // }, [tweets]);
-
   // Show loading state while user authentication is being checked
   if (!user) return <FeedLoadingSkeleton />;
 
@@ -89,39 +82,22 @@ export default function FeedClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br  from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gray-50 text-gray-800">
       <Header />
 
-      <div className="max-w-6xl mx-auto gap-6 p-4">
-        {/* Desktop Sidebar */}
-        <DesktopSidebar />
+      <main className="grid grid-cols-1 lg:grid-cols-[280px_1fr] xl:grid-cols-[280px_1fr_340px] gap-8 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Left Sidebar */}
+        <aside className="hidden lg:block sticky top-24 h-fit">
+          <DesktopSidebar />
+        </aside>
 
         {/* Main Content */}
-        <div className="flex-1 max-w-2xl mx-auto lg:mx-0">
-          {/* Desktop Header */}
-          <div className="hidden lg:block mb-6">
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-              <CardHeader>
-                <h2 className="text-2xl font-bold text-slate-800">Your Feed</h2>
-                <p className="text-slate-600">
-                  Stay connected with your community
-                </p>
-              </CardHeader>
-            </Card>
-          </div>
-
-          <div className="my-2">
+        <div className="w-full">
+          <div className="lg:hidden mb-6">
             <SearchBar />
           </div>
 
-          <Link href={"/post-tweet"}>
-            <button className="w-full text-lg my-2 border p-2 rounded-lg bg-gradient-to-r from-[#B148FF] via-[#C029B5] to-[#DE0183] text-white">
-              Post a tweet
-            </button>
-          </Link>
-
-          <div className="space-y-6 my-4">
-            {/* Who to Follow */}
+          <div className="xl:hidden my-6">
             <ConnectionSuggestions isHorizontal={true} />
           </div>
 
@@ -130,19 +106,19 @@ export default function FeedClient() {
 
           {/* Infinite Scroll Trigger */}
           {hasNextPage && (
-            <div ref={loadMoreRef} className="flex justify-center py-4">
+            <div ref={loadMoreRef} className="flex justify-center py-6">
               {isFetchingNextPage ? (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 text-gray-500">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
-                  <span className="text-slate-600">Loading more tweets...</span>
+                  <span>Loading...</span>
                 </div>
               ) : (
                 <Button
                   onClick={handleLoadMore}
                   variant="outline"
-                  className="text-purple-600 border-purple-600 hover:bg-purple-50"
+                  className="text-purple-600 border-purple-600 hover:bg-purple-50 rounded-full px-6"
                 >
-                  Load more tweets
+                  Load More
                 </Button>
               )}
             </div>
@@ -150,52 +126,45 @@ export default function FeedClient() {
 
           {/* End of feed indicator */}
           {!hasNextPage && tweets.length > 0 && (
-            <div className="text-center py-8 text-slate-500">
-              <p>You have reached the end of your feed!</p>
+            <div className="text-center py-10 text-gray-500">
+              <p className="font-semibold">You have reached the end!</p>
+              <p className="text-sm">Check back later for new tweets.</p>
               <Button
                 onClick={() => refetch()}
                 variant="ghost"
-                className="mt-2 text-purple-600 hover:text-purple-700"
+                className="mt-4 text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-full"
               >
-                Refresh to see new tweets
+                Refresh Feed
               </Button>
             </div>
           )}
         </div>
 
-        {/* Desktop Right Sidebar */}
-        <div className="hidden xl:block w-80 sticky top-4 h-fit space-y-6">
-          {/* Search */}
-
-          {/* Trending */}
+        {/* Right Sidebar */}
+        <aside className="hidden xl:block sticky top-24 h-fit space-y-8">
+          <SearchBar />
           <TrendingSection />
-
-          {/* People Suggestions - Updated to use recommended_profiles data */}
           <ConnectionSuggestions />
-        </div>
-      </div>
+        </aside>
+      </main>
 
       {/* Mobile Bottom Navigation */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-slate-200 p-2">
-        <div className="flex items-center justify-around">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200">
+        <div className="flex items-center justify-around max-w-md mx-auto">
           {navigationItems.slice(0, 5).map((item, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              size="sm"
-              className={`flex flex-col items-center space-y-1 p-2 ${
-                item.active ? "text-purple-600" : "text-slate-600"
-              }`}
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="text-xs">{item.label}</span>
-            </Button>
+            <Link href={item.href || "#"} key={index} className="flex-1">
+              <div
+                className={`flex flex-col items-center space-y-1 py-2 px-1 text-center `}
+              >
+                <item.icon className="h-6 w-6" />
+                <span className="text-xs font-medium">{item.label}</span>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
-
-      {/* Mobile spacing for bottom nav */}
-      <div className="lg:hidden h-20"></div>
+      {/* Spacer for mobile nav */}
+      <div className="lg:hidden h-16"></div>
     </div>
   );
 }

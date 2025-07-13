@@ -30,7 +30,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 export default function ProfileTabs({
   onTabChange,
@@ -70,18 +70,24 @@ export default function ProfileTabs({
   };
   const [activeTab, setActiveTab] = useState("Your Tweets");
 
-  const { data: savedTweets, isPending } = useSavedTweets({
+  const { data, isPending } = useSavedTweets({
     id: user_id,
     enabled: activeTab === "Saved Tweets",
   });
 
+  const savedTweets = useMemo(
+    () => data?.savedTweets ?? [],
+    [data?.savedTweets]
+  );
+
   useEffect(() => {
     if (savedTweets) {
-      console.log(savedTweets);
+      console.log("SAVED TWEETS", savedTweets);
     }
   }, [savedTweets]);
 
   if (!Profile) return;
+
   return (
     <div>
       <div className="flex space-x-1 bg-gray-100 rounded-xl p-1">
@@ -105,7 +111,8 @@ export default function ProfileTabs({
 
       {activeTab == "Your Tweets" && (
         <div className="space-y-4">
-          {Profile.tweets_with_counts.length === 0 ? (
+          {!Profile.tweets_with_counts ||
+          Profile.tweets_with_counts.length === 0 ? (
             <Card className="bg-white rounded-2xl my-4 shadow-sm border-0">
               <CardContent className="p-12 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
@@ -243,7 +250,7 @@ export default function ProfileTabs({
             </div>
           ) : (
             <>
-              {savedTweets?.length === 0 ? (
+              {savedTweets && savedTweets?.length === 0 ? (
                 <div className="text-center py-12">
                   <Bookmark className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold mb-2">
@@ -296,7 +303,7 @@ export default function ProfileTabs({
                           {tweet.text}
                         </p>
 
-                        {tweet.tags.length > 0 && (
+                        {tweet.tags && tweet.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {tweet.tags.map((tag, index) => (
                               <Badge
@@ -341,7 +348,8 @@ export default function ProfileTabs({
                             </Button>
 
                             <LikeButton
-                              likeState={tweet.liked_by_current_user}
+                              count={tweet.like_count}
+                              likeState={tweet.is_liked_by_current_user}
                               user_id={tweet.profile_id}
                               id={tweet.id}
                             />
@@ -356,7 +364,7 @@ export default function ProfileTabs({
                           </div>
 
                           <SaveButton
-                            state={tweet.saved_by_current_user}
+                            state={tweet.is_liked_by_current_user}
                             id={tweet.id}
                           />
                         </div>

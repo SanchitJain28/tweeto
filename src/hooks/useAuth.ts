@@ -4,6 +4,7 @@ import { authContext } from "@/contexts/authContext";
 import { createClient } from "@/utils/supabase/client";
 import { FullProfile, Profile } from "@/types/Types";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const supabase = createClient();
 
@@ -17,20 +18,18 @@ interface Tweet {
   is_liked_by_current_user: boolean;
 }
 
-export interface SavedTweet {
+interface SavedTweet {
   id: string;
   profile_id: string;
-  text: string;
   image_url: string | null;
+  text: string;
+  created_at: string;
+  updated_at: string;
   tags: string[];
   like_count: number;
-  comment_count: number;
-  liked_by_current_user: boolean;
-  saved_by_current_user: boolean;
-  created_at: string;  // or Date if you plan to parse it
-  updated_at: string;  // or Date if you plan to parse it
+  is_liked_by_current_user: boolean;
+  saved_at: string;
 }
-
 
 interface UserProfile {
   bio: string;
@@ -67,10 +66,10 @@ export async function getFullProfile(id: string): Promise<FullProfile> {
     user_id: id,
   });
 
-  console.log(data)
+  console.log(data);
 
-  if (error) throw error
-  return data
+  if (error) throw error;
+  return data;
 }
 
 export const useProfile = ({
@@ -133,20 +132,26 @@ export function useProfileWithStats({ username }: { username: string }) {
   });
 }
 
-async function FetchSavedTweets(id:string) : Promise<SavedTweet[]>{
-  const {data,error}= await supabase.rpc("get_saved_tweets",{
-    current_profile_id : id
-  })
-  if(error){
-    throw error
-  }
-  return data
+async function FetchSavedTweets(): Promise<{
+  status: boolean;
+  message: string;
+  savedTweets: SavedTweet[];
+}> {
+  const { data } = await axios.get("/api/fetch-saved-tweets");
+
+  return data;
 }
 
-export function useSavedTweets({ id ,enabled}: { id: string, enabled : boolean }) {
+export function useSavedTweets({
+  id,
+  enabled,
+}: {
+  id: string;
+  enabled: boolean;
+}) {
   return useQuery({
     queryKey: ["savedTweets", id],
-    queryFn: () => FetchSavedTweets(id),
+    queryFn: () => FetchSavedTweets(),
     staleTime: 0,
     gcTime: 0,
     enabled, // Only run if id is truthy
