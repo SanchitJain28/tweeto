@@ -25,6 +25,7 @@ export default function FeedClient() {
     isLoading,
     refetch,
     data,
+    
   } = useFeedData();
 
   const loadMoreRef = useRef<HTMLDivElement>(null);

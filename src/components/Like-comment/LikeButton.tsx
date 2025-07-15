@@ -49,6 +49,7 @@ export default function LikeButton({
         toast.error("Error liking the post");
         return false;
       }
+    console.log(queryClient.getQueriesData({queryKey : ["feed"]}))  
       return true;
     } catch (error) {
       console.error("Like error:", error);
