@@ -27,6 +27,7 @@ export default function LoginPage() {
   const supabase = createClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const handleSignIn = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
@@ -41,11 +42,15 @@ export default function LoginPage() {
 
   const handleSignInWithGoogle = async () => {
     try {
+      console.log(
+        "Redirecting to:",
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`
+      );
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `http://localhost:3000/auth/callback`,
-          scopes: "email profile",
+          redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
         },
       });
       console.log(data);
@@ -53,10 +58,6 @@ export default function LoginPage() {
         console.log(error);
         toast("Error logging you in with Google" + error);
       }
-      // toast("Google login successful", {
-      //   position: "bottom-center",
-      //   type: "success",
-      // });
     } catch (error) {
       console.log(error);
       const { response } = error as AxiosError<{ message: string }>;
