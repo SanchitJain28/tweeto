@@ -43,7 +43,7 @@ export default function ProfileClient() {
     image_url: string;
   } | null>(null);
 
-  const [activeTab, setActiveTab] = useState("Your Tweets");
+  const [, setActiveTab] = useState("Your Tweets");
 
   const handleUpdate = (change: {
     id: string;
