@@ -43,6 +43,7 @@ export default function ProfileClientOthers() {
   const { data, isError, isPending } = useProfileWithStats({
     username: username,
   })
+  console.log("CHAL JA BHADWE ")
 
   const formatDate = (date: string | Date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -69,6 +70,8 @@ export default function ProfileClientOthers() {
       .toUpperCase()
       .slice(0, 2)
   }
+
+  console.log("PROFILE DATA",data)
 
   const [localProfile, setLocalProfile] = useState<UserProfile | null>(null)
 
@@ -139,6 +142,7 @@ export default function ProfileClientOthers() {
   if (!user) {
     return null
   }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useCallback, useMemo } from "react";
 import { Heart, HeartOff } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
@@ -49,7 +50,31 @@ export default function LikeButton({
         toast.error("Error liking the post");
         return false;
       }
-    console.log(queryClient.getQueriesData({queryKey : ["feed"]}))  
+
+      const feedData = queryClient.getQueriesData({ queryKey: ["feed"] });
+
+      console.log("FEED DATA", feedData);
+
+      // Safely handle unknown result from getQueriesData
+      let alltweetsFromFeed: any[] = [];
+      if (Array.isArray(feedData)) {
+        const flat = (feedData as any[]).flat();
+        if (Array.isArray(flat) && flat.length > 1 && flat[1] && Array.isArray(flat[1].pages)) {
+          alltweetsFromFeed = flat[1].pages.flatMap((page: any) => {
+            return page.tweets ?? [];
+          });
+        } else {
+          // Fallback: try to collect tweets from any entries that have pages
+          alltweetsFromFeed = flat.flatMap((entry: any) =>
+            entry?.pages?.flatMap((page: any) => page.tweets ?? []) ?? []
+          );
+        }
+      } else {
+        // Unexpected structure; log and leave alltweetsFromFeed empty
+        console.warn("Unexpected feedData structure", feedData);
+      }
+
+      console.log("All Tweets from feed", alltweetsFromFeed);
       return true;
     } catch (error) {
       console.error("Like error:", error);

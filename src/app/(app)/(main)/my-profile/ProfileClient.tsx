@@ -5,7 +5,6 @@ import type React from "react";
 import Header from "@/components/header-footer-sidebar/Header";
 import { EditDeleteDrawer } from "@/components/main/edit-delete-tweet/EditDeleteComponent";
 import { Card, CardContent } from "@/components/ui/card";
-
 import { useAuth, useFullProfile } from "@/hooks/useAuth";
 import type { FullProfile } from "@/types/Types";
 import { Hash, TrendingUp } from "lucide-react";
@@ -17,9 +16,11 @@ import ProfileLoading from "./loading-error-ui/profileLoading";
 import LeftSidebar from "./sidebars/LeftSidebar";
 import ConnectionSuggestions from "../feed/sections/ConnectionSuggestions";
 import ProfileTabs from "./sidebars/ProfileTabs";
+import { useRouter } from "next/navigation";
 
 export default function ProfileClient() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
   const {
     data: fullProfile,
     isPending,
@@ -27,6 +28,10 @@ export default function ProfileClient() {
   } = useFullProfile({
     id: user?.id ?? "",
   });
+
+  const router = useRouter();
+
+  console.log("MY PROFILE DATA", fullProfile);
 
   const [isOpen, setIsOpen] = useState(false);
   const [modalProps, setModalProps] = useState<{
@@ -109,13 +114,16 @@ export default function ProfileClient() {
     { tag: "TypeScript", posts: "756 posts" },
   ];
 
+  if (isPending || loading) return <ProfileLoading />;
+
   if (isError) return <ProfileError />;
 
   if (!fullProfile || !localProfile) return <ProfileError />;
 
-  if (isPending) return <ProfileLoading />;
-
-  if (!user) return <ProfileError />;
+  if (!user) {
+    router.push("/login");
+    return;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

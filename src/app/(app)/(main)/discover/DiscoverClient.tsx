@@ -20,7 +20,6 @@ export default function DiscoverClient() {
   const { tweets, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
     useFeedData();
 
-  // Only fetch category tweets when activeTab is not "for-you"
   const shouldFetchCategory = activeTab !== "for-you";
 
   const {

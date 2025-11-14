@@ -51,23 +51,14 @@ export function useAuth() {
   }
   return context;
 }
+
+
 export async function getProfile(id: string): Promise<Profile> {
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", id)
     .single();
-  if (error) throw error;
-  return data;
-}
-
-export async function getFullProfile(id: string): Promise<FullProfile> {
-  const { data, error } = await supabase.rpc("get_myprofile", {
-    user_id: id,
-  });
-
-  console.log(data);
-
   if (error) throw error;
   return data;
 }
@@ -88,16 +79,26 @@ export const useProfile = ({
   });
 };
 
+export async function getFullProfile(): Promise<FullProfile> {
+  try {
+    const {
+      data: { data },
+    } = await axios.get("/api/fetch-user-profile");
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const useFullProfile = ({
-  id,
   enabled,
 }: {
   id: string;
   enabled?: boolean;
 }) => {
   return useQuery({
-    queryKey: ["FullProfile", id],
-    queryFn: () => getFullProfile(id),
+    queryKey: ["FullProfile"],
+    queryFn: () => getFullProfile(),
     staleTime: 0,
     gcTime: 0,
     enabled: enabled,

@@ -2,10 +2,11 @@
 import TweetCard from "@/components/main/feed/TweetCard";
 import Link from "next/link";
 import ConnectionSuggestions from "./ConnectionSuggestions";
+
 export interface TweetCardProps {
   id: string;
-  created_at: string; // ISO date string
-  updated_at: string; // ISO date string
+  created_at: string;
+  updated_at: string;
   text: string;
   image_url: string | null;
   liked_by_current_user: boolean;
@@ -17,7 +18,7 @@ export interface TweetCardProps {
 }
 
 export interface TweetWithStatsAndUser {
-  updated_at: string; // ISO date string
+  updated_at: string;
   tags: string[] | null;
 }
 
@@ -29,16 +30,18 @@ export default function PostFeed({
   user_id: string;
 }) {
   return (
-    <div className="space-y-3 sm:space-y-4 md:space-y-6">
+    <div className="space-y-4">
       {tweets.map((post, index) => {
         return (
-          <div className="" key={index}>
+          <div key={index}>
             {index % 10 === 0 && index !== 0 ? (
               <div className="flex flex-col">
                 <Link href={`/tweet/${post.id}`}>
                   <TweetCard post={post} user_id={user_id} />
                 </Link>
-                <ConnectionSuggestions isHorizontal={true} />
+                <div className="my-4">
+                  <ConnectionSuggestions isHorizontal={true} />
+                </div>
               </div>
             ) : (
               <Link href={`/tweet/${post.id}`}>

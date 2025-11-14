@@ -22,7 +22,9 @@ import {
   ChevronRight,
   LogIn,
   UserPlus,
+  OutdentIcon,
 } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 const allNavigationItems = [
   { icon: Home, label: "Home", active: false, href: "/", requiresAuth: false },
@@ -41,6 +43,11 @@ const allNavigationItems = [
     href: "/my-profile",
     requiresAuth: true,
   },
+  {
+    icon: OutdentIcon,
+    label: "Sign Out",
+    requiresAuth: true,
+  },
 ];
 
 const guestNavigationItems = [
@@ -52,10 +59,20 @@ export default function Header() {
   const { user, profile, loading } = useAuth();
   const { unreadCount } = useNotification();
   const [isOpen, setIsOpen] = useState(false);
+  const supabase = createClient();
+
+  const avatarUrl = () => {
+    const url = `https://api.dicebear.com/7.x/adventurer/svg?seed=${profile?.username}`;
+
+    return url;
+  };
 
   const isSignedIn = !!user;
 
-  // Filter navigation items based on authentication state
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   const navigationItems = isSignedIn
     ? allNavigationItems.filter((item) => !item.requiresAuth || isSignedIn)
     : [
@@ -88,7 +105,7 @@ export default function Header() {
                     <Skeleton className="h-12 w-12 rounded-full" />
                   ) : (
                     <Avatar className="h-12 w-12 ring-2 ring-blue-100">
-                      <AvatarImage src={"/placeholder.svg"} alt={"user"} />
+                      <AvatarImage src={avatarUrl()} alt={"user"} />
                     </Avatar>
                   )}
                   <div>
@@ -127,7 +144,12 @@ export default function Header() {
             <Link
               key={index}
               href={item.href || "#"}
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                if (item.label === "Sign Out") {
+                  handleSignOut();
+                }
+                setIsOpen(false);
+              }}
             >
               <Button
                 variant="ghost"

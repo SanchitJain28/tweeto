@@ -88,6 +88,9 @@ export function AuthContext({ children }: { children: React.ReactNode }) {
       setLoading(true);
       try {
         if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+          if(session?.user){
+            
+          }
           setUser(session?.user ?? null);
           getProfile(session?.user.id ?? "");
         } else if (event === "SIGNED_OUT") {

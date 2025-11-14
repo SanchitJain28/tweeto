@@ -18,10 +18,9 @@ import axios from "axios";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import LoadingBackdrop from "@/components/loading/loadingBackdrop";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 export default function SignupPage() {
-    const router = useRouter()
-
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState<User | null>(null);
@@ -30,7 +29,7 @@ export default function SignupPage() {
   const getUser = async () => {
     const { data } = await supabase.auth.getUser();
     setUser(data.user);
-    console.log(data)
+    console.log(data);
   };
   useEffect(() => {
     getUser();
@@ -44,8 +43,6 @@ export default function SignupPage() {
     );
   }
 
-
-
   const handleSignUp = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
@@ -54,8 +51,10 @@ export default function SignupPage() {
         email,
         password,
       });
-      router.push(`signup/profile`);
-      // router.push(`signup/confirm?e=${email}&p=${password}`);
+
+      console.log(data)
+      // router.push(`signup/profile`);
+      router.push(`signup/confirm`);
       console.log(data);
     } catch (error) {
       console.log(error);
@@ -162,7 +161,7 @@ export default function SignupPage() {
         </CardFooter>
       </Card>
 
-    <LoadingBackdrop isVisible={loading} message="Loading"/>
+      <LoadingBackdrop isVisible={loading} message="Loading" />
     </div>
   );
 }

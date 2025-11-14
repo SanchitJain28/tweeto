@@ -9,17 +9,18 @@ export default function Home() {
   const { user, loading, profile } = useAuth();
   const router = useRouter();
 
-  const LOADING = loading;
-
-  if (LOADING) {
+  if (loading) {
     return (
       <LoadingBackdrop isVisible={loading} message="Loading, Please wait" />
     );
   }
 
-  // Show different pages based on authentication status
   if (user && profile) {
-    router.push("/feed");
+    return router.push("/feed");
+  }
+
+  if (!user && !loading) {
+    return router.push("/login");
   }
 
   return <UnsignedHome />;
